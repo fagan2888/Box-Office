@@ -29,7 +29,7 @@ movies_new = movies[movies['release_date']>='1995-01-01']
 #URL. As a result, what I provide here will likely time out for you.
 url = 'http://www.omdbapi.com/?i='
 #url = 'http://---.--.---.--/?i='  #can't provide his direct server URL address
-api_key = '&apikey=df2ef738'
+api_key = '&apikey=[mykey]'
 
 #Start a count to keep track of where we are (not necessary).
 #Create an empty list called "appended_data".
