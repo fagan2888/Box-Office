@@ -27,7 +27,7 @@ movies = pd.read_csv(r'c:\users\rebecca\desktop\movies\2018 Movies\full_list.csv
 #and replace the alpha-numeric key below with your own.
 url_p1 = 'https://api.themoviedb.org/3/search/movie?query='
 url_p2 = '&primary_release_year='
-api_key = '&api_key=61d0a9ceced5fe9582a066af57b751ef'
+api_key = '&api_key=[mykey]'
 
 #Start a count to keep track of where we are (not necessary).
 #Create an empty list called "appended_data".
@@ -76,7 +76,7 @@ flatten_tmdb_pull_newMovies17.reset_index(drop=True, inplace=True)
 #Get your own API Key from the The Movies Database API website
 #and replace the alpha-numeric key below with your own.
 url = 'https://api.themoviedb.org/3/movie/'
-api_key = '?api_key=61d0a9ceced5fe9582a066af57b751ef'
+api_key = '?api_key=[mykey]'
 
 
 #Start a count to keep track of where we are (not necessary).
