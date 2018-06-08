@@ -25,7 +25,7 @@ movies = pd.read_csv(r'c:\users\rebecca\desktop\movies\2018 Movies\2017_movies_o
 #for this to run without errors. He asked that I not share that
 #URL. As a result, what I provide here will likely time out for you.
 #url = 'http://www.omdbapi.com/?t='
-url_p1 = 'http://108.60.201.28/?t='  #can't provide his direct server URL address
+url_p1 = 'http://---.--.---.--/?t='  #can't provide his direct server URL address
 url_p2 = '&y='
 api_key = '&apikey=df2ef738'
 
