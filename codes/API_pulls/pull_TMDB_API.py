@@ -11,6 +11,13 @@ import requests
 import time
 from pandas.io.json import json_normalize
 
+#This code will perform two rounds of pulls from the The Movies Database API website.
+#The first round will use imdb ids from another dataset to do the initial pull.
+#But we can get more information if we use the API's own id. 
+#So the secound round will use another set of ids pulled from the first round.
+
+
+#First round of pulls.
 #This code needs the "imdb_ids" of the movies listed in
 #the Kaggle dataset here: https://www.kaggle.com/rounakbanik/the-movies-dataset/data,
 #in "movies_metadata.csv". If you want to run this code,
@@ -26,7 +33,7 @@ movies_new = movies[movies['release_date']>='1995-01-01']
 #and replace the alpha-numeric key below with your own.
 url_p1 = 'https://api.themoviedb.org/3/find/'
 url_p2='&language=en-US&external_source=imdb_id'
-api_key = '?api_key=[mykey]'
+api_key = '?api_key=61d0a9ceced5fe9582a066af57b751ef'
 
 #Start a count to keep track of where we are (not necessary).
 #Create an empty list called "appended_data".
@@ -75,3 +82,50 @@ genre_ids = json_normalize(genre_ids[0])
 #If you want the genre ids spit out into CSV file, use code below
 #and put in your destination.
 genre_ids.to_csv(r'c:\users\rebecca\desktop\genre_ids.csv')
+
+
+###############################################################
+#Second round of pulls.
+#Building our API URL again. 
+#Get your own API Key from the The Movies Database API website
+#and replace the alpha-numeric key below with your own.
+url = 'https://api.themoviedb.org/3/movie/'
+api_key = '?api_key=61d0a9ceced5fe9582a066af57b751ef'
+
+
+#Start a count to keep track of where we are (not necessary).
+#Create an empty list called "appended_data".
+count =0
+append_data = []
+
+for item in movies_tmdbapi['id']:
+
+        response = requests.get(url+str(item) +api_key)
+        data = response.json()
+        append_data.append(data)#['results'])
+        count+=1
+        #This API requres a time delay, so
+        #adding 6 second delay after 20 rows pulled
+        if count%20 == 0:
+            print("Pulled",count,"rows")
+            time.sleep(6)  
+            
+            
+#This API output is a string of information, so we need
+#to make it into a readable column format. 
+#The JSON_Normalize function helps do this.
+#However, going line by line is inefficient, 
+#and looking for better ways to do this.
+movies_tmdbapi_full = []
+for item in range(0,len(append_data)):
+    movies_tmdbapi_full.append(json_normalize(append_data[item]))
+movies_tmdbapi_full = pd.concat(movies_tmdbapi_full)   
+
+movies_tmdbapi_full = movies_tmdbapi_full.drop(columns = ['adult', 'backdrop_path', 'belongs_to_collection', \
+           'belongs_to_collection.backdrop_path', 'belongs_to_collection.id', 'belongs_to_collection.poster_path', \
+           'homepage', 'poster_path', 'status', 'status_code', 'status_message', 'video'])
+movies_tmdbapi_full.to_csv(r'c:\users\rebecca\desktop\movies_tmdbapi_full.csv')
+            
+            
+
+
