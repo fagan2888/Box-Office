@@ -33,7 +33,7 @@ movies_new = movies[movies['release_date']>='1995-01-01']
 #and replace the alpha-numeric key below with your own.
 url_p1 = 'https://api.themoviedb.org/3/find/'
 url_p2='&language=en-US&external_source=imdb_id'
-api_key = '?api_key=61d0a9ceced5fe9582a066af57b751ef'
+api_key = '?api_key=[mykey]'
 
 #Start a count to keep track of where we are (not necessary).
 #Create an empty list called "appended_data".
