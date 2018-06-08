@@ -27,7 +27,7 @@ movies = pd.read_csv(r'c:\users\rebecca\desktop\movies\2018 Movies\2017_movies_o
 #url = 'http://www.omdbapi.com/?t='
 url_p1 = 'http://---.--.---.--/?t='  #can't provide his direct server URL address
 url_p2 = '&y='
-api_key = '&apikey=df2ef738'
+api_key = '&apikey=[mykey]'
 
 #Start a count to keep track of where we are (not necessary).
 #Create an empty list called "appended_data".
