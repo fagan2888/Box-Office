@@ -90,7 +90,7 @@ genre_ids.to_csv(r'c:\users\rebecca\desktop\genre_ids.csv')
 #Get your own API Key from the The Movies Database API website
 #and replace the alpha-numeric key below with your own.
 url = 'https://api.themoviedb.org/3/movie/'
-api_key = '?api_key=61d0a9ceced5fe9582a066af57b751ef'
+api_key = '?api_key=[mykey]'
 
 
 #Start a count to keep track of where we are (not necessary).
