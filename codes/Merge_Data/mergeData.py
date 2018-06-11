@@ -48,9 +48,10 @@ movies_full_test2=movies_full_test2.drop(columns=movie_name_list_columns)
 # 
 # =============================================================================
 
+movies_full_test2['BoxOfficeFixed'] = movies_full_test2['BoxOffice']
+movies_full_test2['BoxOfficeFixed'] = movies_full_test2['BoxOfficeFixed'].apply(lambda x: \
+                 float(x.strip('$').replace(',','')) if  type(x)==str and 'k' not in x else np.nan) 
 
-movies_full_test2['BoxOfficeFixed'] = movies_full_test2['BoxOffice'].apply(lambda x: \
-                 int(x.strip('$').replace(',','')) if type(x)==str else x)
 
 movie_rev_list_columns = ['BoxOfficeFixed','revenue','revenue_x','revenue_y','Worldwide Gross']
 
