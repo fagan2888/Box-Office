@@ -101,8 +101,9 @@ def getListCollection(x):
     collList=[]
     if x is not None and not type(x)==float and not x=='False':#not np.isnan(x):
         y=ast.literal_eval(x)
-        collList.append(y['name'])
-
+        if not type(y)==float:
+            collList.append(y['name'])
+        
     return collList
 
 movies_full_test['belongs_to_collection_list']= movies_full_test['belongs_to_collection'].apply(getListCollection)
@@ -149,3 +150,27 @@ def getListKeywords(x):
 
 movies_full_test['keywords_x_list']= movies_full_test['keywords_x'].apply(getListKeywords)
 movies_full_test['keywords_y_list'] = movies_full_test['keywords_y'].apply(getListKeywords)
+
+
+# =============================================================================
+# Language dicts to list
+# 
+
+# =============================================================================
+
+def getListLangs(x):
+    langList=[]
+    if x is not None and not type(x)==float:# and not x=='False':#not np.isnan(x):
+        if not type(x)==str:
+            x=str(x)
+        y=ast.literal_eval(x)
+        for d in y: 
+            langList.append(d['iso_639_1'])
+    return langList
+
+
+movies_full_test['spoken_languages_list'] = movies_full_test['spoken_languages'].apply(getListLangs)
+movies_full_test['spoken_languages_x_list']= movies_full_test['spoken_languages_x'].apply(getListLangs)
+movies_full_test['spoken_languages_y_list'] = movies_full_test['spoken_languages_y'].apply(getListLangs)
+
+
