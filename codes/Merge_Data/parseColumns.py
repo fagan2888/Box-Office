@@ -10,6 +10,7 @@ import numpy as np
 from pandas.io.json import json_normalize
 import json
 import ast
+import re
 
 # =============================================================================
 # #Run joinData code first
@@ -45,7 +46,7 @@ def getRating(x, source):
 movies_full_test['Rating_IMDB']= movies_full_test['Ratings'].apply(getRating, args=('Internet Movie Database',))
 movies_full_test['Rating_RT']= movies_full_test['Ratings'].apply(getRating, args=('Rotten Tomatoes',))
 movies_full_test['Rating_Meta']= movies_full_test['Ratings'].apply(getRating, args=('Metacritic',))
-
+print("Done parsing Ratings")
 # =============================================================================
 # Genre dicts to list
 # 
@@ -67,7 +68,7 @@ def getListGenres(x):
 movies_full_test['genre_x_list'] = movies_full_test['genres_x'].apply(getListGenres)
 movies_full_test['genre_y_list'] = movies_full_test['genres_y'].apply(getListGenres)
 movies_full_test['genre_list'] = movies_full_test['genres'].apply(getListGenres)
-
+print("Done parsing Genres")
 # =============================================================================
 # Production companies dicts to list
 # 
@@ -90,7 +91,7 @@ def getListCompanies(x):
 movies_full_test['production_companies_x_list']= movies_full_test['production_companies_x'].apply(getListCompanies)
 movies_full_test['production_companies_y_list'] = movies_full_test['production_companies_y'].apply(getListCompanies)
 movies_full_test['production_companies_list'] = movies_full_test['production_companies'].apply(getListCompanies)
-
+print("Done parsing Companies")
 # =============================================================================
 # Movie collection/series to list
 # 
@@ -107,7 +108,7 @@ def getListCollection(x):
     return collList
 
 movies_full_test['belongs_to_collection_list']= movies_full_test['belongs_to_collection'].apply(getListCollection)
-
+print("Done parsing Collection")
 # =============================================================================
 # Cast dicts to list
 # 
@@ -128,7 +129,7 @@ def getListCast(x):
 
 movies_full_test['cast_x_list']= movies_full_test['cast_x'].apply(getListCast)
 movies_full_test['cast_y_list'] = movies_full_test['cast_y'].apply(getListCast)
-
+print("Done parsing Cast")
 
 # =============================================================================
 # Keywords dicts to list
@@ -150,12 +151,11 @@ def getListKeywords(x):
 
 movies_full_test['keywords_x_list']= movies_full_test['keywords_x'].apply(getListKeywords)
 movies_full_test['keywords_y_list'] = movies_full_test['keywords_y'].apply(getListKeywords)
-
+print("Done parsing Keywords")
 
 # =============================================================================
 # Language dicts to list
 # 
-
 # =============================================================================
 
 def getListLangs(x):
@@ -172,5 +172,72 @@ def getListLangs(x):
 movies_full_test['spoken_languages_list'] = movies_full_test['spoken_languages'].apply(getListLangs)
 movies_full_test['spoken_languages_x_list']= movies_full_test['spoken_languages_x'].apply(getListLangs)
 movies_full_test['spoken_languages_y_list'] = movies_full_test['spoken_languages_y'].apply(getListLangs)
+print("Done parsing Languages")
+# =============================================================================
+# Crew dicts to list
+# 
+# =============================================================================
+
+def getListCrew(x, job):
+    if x is not None and not type(x)==float:
+        y=ast.literal_eval(x)
+        if job =='Director':
+            dirList=[]
+            for person in y:
+                if person['job']=='Director':
+                    dirList.append(person['name'])
+            return dirList        
+        if job =='Screenplay':
+            wriList=[]
+            for person in y:            
+                if person['job']=='Screenplay':
+                    wriList.append(person['name'])        
+            return wriList
+        if job =='Producer': 
+            prodList=[]
+            for person in y:                 
+                if person['job']=='Producer':
+                    prodList.append(person['name'])
+            return prodList
+              
+        
+movies_full_test['crew_x_director']= movies_full_test['crew_x'].apply(getListCrew, args=('Director',))
+movies_full_test['crew_x_director']=movies_full_test['crew_x_director'].apply(lambda x: [] if x is None else x)
+
+movies_full_test['crew_x_writer']= movies_full_test['crew_x'].apply(getListCrew, args=('Screenplay',))
+movies_full_test['crew_x_writer']=movies_full_test['crew_x_writer'].apply(lambda x: [] if x is None else x)
+
+movies_full_test['crew_x_producer']= movies_full_test['crew_x'].apply(getListCrew, args=('Producer',))
+movies_full_test['crew_x_producer']=movies_full_test['crew_x_producer'].apply(lambda x: [] if x is None else x)
+
+movies_full_test['crew_y_director']= movies_full_test['crew_y'].apply(getListCrew, args=('Director',))
+movies_full_test['crew_y_director']=movies_full_test['crew_y_director'].apply(lambda x: [] if x is None else x)
+
+movies_full_test['crew_y_writer']= movies_full_test['crew_y'].apply(getListCrew, args=('Screenplay',))
+movies_full_test['crew_y_writer']=movies_full_test['crew_y_writer'].apply(lambda x: [] if x is None else x)
+
+movies_full_test['crew_y_producer']= movies_full_test['crew_y'].apply(getListCrew, args=('Producer',))
+movies_full_test['crew_y_producer']=movies_full_test['crew_y_producer'].apply(lambda x: [] if x is None else x)
+print("Done parsing Crew")
+
+# =============================================================================
+# Remove parentheticals in Writer column, convert to list
+# 
+# =============================================================================
+
+def getListWriter(x):
+    
+    WriterFixed=[]  
+    
+    if x is not None and not type(x)==float:
+        y=re.sub(r' \([^)]*\)', '',x)
+        WriterFixed=y.split(", ")
+        
+    return WriterFixed
+              
+movies_full_test['Writer_fix']= movies_full_test['Writer'].apply(getListWriter)
+print("Done parsing Writer")
+
+
 
 

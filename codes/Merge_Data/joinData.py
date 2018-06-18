@@ -140,15 +140,5 @@ movies_full.reset_index(drop=True, inplace=True)
 print("Done joining The Numbers data")
 
 
-# =============================================================================
-# #Drop non-English movies
-# #FINAL table of movies is called movies_full
-# =============================================================================
-#movies_full = movies_full[(movies_full['original_language_x']=='en') | (movies_full['original_language_x'].isnull())]
-#movies_full.reset_index(drop=True, inplace=True)
-
-
-###############3
-##########Don't drop english for now, wait until MergeData
 
 ##########Might need to run The Numbers data through APIs
