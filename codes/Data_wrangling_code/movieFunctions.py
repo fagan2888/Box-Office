@@ -280,9 +280,174 @@ def getMoviePop(x, columns):
     return x[columns].mean()
 
 
+# =============================================================================
+# This third set of functions are used to convert certain columns into usable
+# features in regression/classification models
+# =============================================================================    
     
+def makeGenreBoolean(x, genre):
+    #convert list of genres for each movie into boolean-type columns for 
+    #9 major genre categories
+    setMainGenres = {'Drama', 'Comedy', 'Action', 'Adventure', 'Thriller', \
+                 'Horror', 'Romance', 'Crime', 'Mystery', 'Animation', \
+                 'Science Fiction', 'Sci-Fi', 'Documentary'}
+    if genre=='Genre_Drama':
+        if 'Drama' in x:
+            return 1
+        else: 
+            return 0
+    elif genre =='Genre_Comedy':        
+        if 'Comedy' in x:
+            return 1         
+        else: 
+            return 0
+    elif genre =='Genre_Action_Adventure':            
+        if 'Action' in x or 'Adventure' in x:
+            return 1 
+        else: 
+            return 0            
+    elif genre =='Genre_Thriller_Horror':      
+        if 'Thriller' in x or 'Horror' in x:
+            return 1 
+        else: 
+            return 0                 
+    elif genre =='Genre_Romance':
+        if 'Romance' in x:
+            return 1 
+        else: 
+            return 0         
+    elif genre =='Genre_Crime_Mystery':    
+        if 'Crime' in x or 'Mystery' in x:
+            return 1         
+        else: 
+            return 0         
+    elif genre =='Genre_Animation':    
+        if 'Animation' in x:
+            return 1
+        else: 
+            return 0         
+    elif genre =='Genre_Scifi':    
+        if 'Science Fiction' in x or 'Sci-Fi' in x:
+            return 1 
+        else: 
+            return 0         
+    elif genre =='Genre_Documentary':
+        if 'Documentary' in x:
+            return 1 
+        else: 
+            return 0         
+    elif genre=='Genre_Other':
+        if len(set(x) - setMainGenres) > 0:
+            return 1
+        else: 
+            return 0
+
+def makeRatedBoolean(x, rated):
+    #convert ratings for each movie into boolean-type columns for 
+    #3 major genre categories
+    listMainRatings = ['G', 'PG', 'PG-13', 'R']
+    if rated=='Rated_G_PG':
+        if x=='G' or x=='PG':
+            return 1
+        else: 
+            return 0
+    elif rated =='Rated_PG-13':        
+        if x=='PG-13':
+            return 1         
+        else: 
+            return 0
+    elif rated =='Rated_R':            
+        if x=='R':
+            return 1 
+        else: 
+            return 0                    
+    elif rated=='Rated_Other':
+        if x not in listMainRatings:
+            return 1
+        else: 
+            return 0
+
+
+def limitNumActors(x, number):
+    #limit number of actors to certain number
+    return x[:number]
+
     
+def getAwards(x, awardType):
+    #Awards column follows a similar pattern across all movies:
+    #If the movie was nominated or won for a major award,
+    #it will be stated in the first of two sentences.
+    #The other minor award nominations and/or wins will be
+    #in the second sentence.
+    #Else, if the movie was only nominated or won for 
+    #minor awards, there will be only one sentence.
+    #So, parsing based on "." and "&" and certain words.
+    majorNod = 0
+    majorWin = 0
+    minorNod = 0
+    minorWin = 0
     
+    if type(x)==str:
+        #If 2 sentences, Indicates movie won/nominated for major award
+        if len(x.split(". ")) == 2:
+            majorAwards = x.split(". ")[0].split(" ")
+            if 'Nominated' in majorAwards:
+                for word in majorAwards:
+                    if isfloat(word):
+                        majorNod = int(word)
+            if 'Won' in majorAwards:
+                for word in majorAwards:
+                    if isfloat(word):
+                        majorWin = int(word)
+            minorAwards = x.split(". ")[1].split("&")
+            if len(minorAwards)>1:
+                if 'nominations' in minorAwards[1] or 'nomination' in minorAwards[1]:
+                    for word in minorAwards[1].split(" "):
+                        if isfloat(word):
+                            minorNod = int(word)
+                if 'wins' in minorAwards[0] or 'win' in minorAwards[0]:
+                    for word in minorAwards[0].split(" "):
+                        if isfloat(word):
+                            minorWin = int(word) 
+            if len(minorAwards)==1:
+                if 'nominations' in minorAwards[0] or 'nomination' in minorAwards[0]:
+                    for word in minorAwards[0].split(" "):
+                        if isfloat(word):
+                            minorNod = int(word)
+                if 'wins' in minorAwards[0] or 'win' in minorAwards[0]:
+                    for word in minorAwards[0].split(" "):
+                        if isfloat(word):
+                            minorWin = int(word)                             
+        #If only 1 sentence, indicates movies won/nominated for only minor awards
+        if len(x.split(". ")) == 1:
+            minorAwards = x.split(". ")[0].split("&")
+            if len(minorAwards)>1:
+                if 'nominations' in minorAwards[1] or 'nomination' in minorAwards[1]:
+                    for word in minorAwards[1].split(" "):
+                        if isfloat(word):
+                            minorNod = int(word)
+                if 'wins' in minorAwards[0] or 'win' in minorAwards[0]:
+                    for word in minorAwards[0].split(" "):
+                        if isfloat(word):
+                            minorWin = int(word)   
+            if len(minorAwards)==1:
+                if 'nominations' in minorAwards[0] or 'nomination' in minorAwards[0]:
+                    for word in minorAwards[0].split(" "):
+                        if isfloat(word):
+                            minorNod = int(word)
+                if 'wins' in minorAwards[0] or 'win' in minorAwards[0]:
+                    for word in minorAwards[0].split(" "):
+                        if isfloat(word):
+                            minorWin = int(word)                             
+                            
+    if awardType == "majorNod":
+        return majorNod
+    if awardType == "majorWin":
+        return majorWin
+    if awardType == "minorNod":
+        return minorNod
+    if awardType == "minorWin":
+        return minorWin
     
     
 

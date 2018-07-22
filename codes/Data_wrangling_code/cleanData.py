@@ -18,7 +18,10 @@ import joinDataModule as jd
 import parseColumnsModule as pc
 import mergeDataModule as md
 
-####Main execution file as of now. This joins, parses, merges, and de-duplicates our data.
+# =============================================================================
+# ####Main execution file as of now. PART 1.
+# ####This first part joins, parses, merges, and de-duplicates our data.
+# =============================================================================
 
 # =============================================================================
 # #Part 1, join all the datasets together.
@@ -62,7 +65,7 @@ movies_full_set = movies_full_set.drop_duplicates(subset=['Movie_Name', 'Year'],
 # =============================================================================
 # #For our working data set, keep only movies with revenue data
 # #or movies released after 2017, since some of the newer
-# #movies may not yet have revenues updated in our static data sources
+# #movies may not yet have revenues updated in our (mostly) static data sources
 # =============================================================================
 movies_working_set = movies_full_set[(movies_full_set['Movie_Date']>='2017-01-01')|(movies_full_set['Movie_Revenue']>0)]
 movies_working_set.reset_index(drop=True, inplace=True)
@@ -84,12 +87,21 @@ movies_working_set['Delete']= 0
 movies_2017 = movies_working_set[(movies_working_set['Movie_Date']>='2017-01-01') & \
                              (movies_working_set['Movie_Date']<='2017-12-31')]
 movies_2018 = movies_working_set[(movies_working_set['Movie_Date']>='2018-01-01')]
+movies_2016 = movies_working_set[(movies_working_set['Movie_Date']>='2016-01-01') & \
+                             (movies_working_set['Movie_Date']<='2016-12-31')]
+movies_2015_2014 = movies_working_set[(movies_working_set['Movie_Date']>='2014-01-01') & \
+                             (movies_working_set['Movie_Date']<='2015-12-31')]
+movies_2013_2010 = movies_working_set[(movies_working_set['Movie_Date']>='2010-01-01') & \
+                             (movies_working_set['Movie_Date']<='2013-12-31')]
+movies_2009_2008 = movies_working_set[(movies_working_set['Movie_Date']>='2008-01-01') & \
+                             (movies_working_set['Movie_Date']<='2009-12-31')]
 
 movies_2017.to_csv(r'c:\users\rebecca\desktop\movies_2017.csv')
 movies_2018.to_csv(r'c:\users\rebecca\desktop\movies_2018.csv')
-
-
-
+movies_2016.to_csv(r'c:\users\rebecca\desktop\movies_2016.csv')
+movies_2015_2014.to_csv(r'c:\users\rebecca\desktop\movies_2015_2014.csv')
+movies_2013_2010.to_csv(r'c:\users\rebecca\desktop\movies_2013_2010.csv')
+movies_2009_2008.to_csv(r'c:\users\rebecca\desktop\movies_2009_2008.csv')
 
 # =============================================================================
 # #Count the number of missing values in each important column
@@ -105,6 +117,7 @@ print("Date", len(movies_working_set)-(movies_working_set['Movie_Date']).count()
 print("Length", len(movies_working_set)-(movies_working_set['Movie_Length'] >0).sum())
 print("Budget", len(movies_working_set)-(movies_working_set['Movie_Budget'] >0).sum())
 print("Genres", len(movies_working_set)- (movies_working_set.astype(str)['Movie_Genres'] != '[]').sum())
+print("Companies", len(movies_working_set)- (movies_working_set.astype(str)['Movie_Companies'] != '[]').sum())
 print("Actors", len(movies_working_set)- (movies_working_set.astype(str)['Movie_Actors'] != '[]').sum())
 print("keywords", len(movies_working_set)- (movies_working_set.astype(str)['Movie_Keywords'] != '[]').sum())
 print("Coll", len(movies_working_set)- (movies_working_set.astype(str)['Movie_Collection'] != '[]').sum())
@@ -118,5 +131,107 @@ print("Meta", len(movies_working_set)- (movies_working_set['Movie_Rating_Metacri
 
 
 
+# =============================================================================
+# ####PART 2: This second part modifies our dataframe to make it ready for feeding into models.
+# =============================================================================
 
 
+
+# =============================================================================
+# Commented-out code below gets list of all unique genre types in dataset, if needed.
+# Rest of code converts list of genres into boolean-type columns for major genres.
+# =============================================================================
+
+#listGenres = list((set.union(*movies_working_set['Movie_Genres'].apply(set).tolist())))
+#test=movies_working_set.join(movies_working_set.Movie_Genres.str.join('|').str.get_dummies())
+#test[['Action','Adventure','Animation','Biography','Comedy','Crime', \
+#       'Documentary','Drama','Family','Fantasy','Foreign','Game-Show', \
+#       'History','Horror','Music','Musical','Mystery','News','Reality-TV', \
+#       'Romance','Sci-Fi','Science Fiction','Short','Sport','TV Movie', \
+#       'Thriller','War','Western']].sum().sort_values()
+#test[listGenres].sum().sort_values()
+test = movies_working_set.copy(deep=True)
+test['Genre_Drama'] = 0
+test['Genre_Comedy'] = 0
+test['Genre_Action_Adventure'] = 0
+test['Genre_Thriller_Horror'] = 0
+test['Genre_Romance'] = 0
+test['Genre_Crime_Mystery'] = 0
+test['Genre_Animation'] = 0
+test['Genre_Scifi'] = 0
+test['Genre_Documentary'] = 0
+test['Genre_Other'] = 0
+
+test['Genre_Drama'] = test['Movie_Genres'].apply(mf.makeGenreBoolean, args=('Genre_Drama',))
+test['Genre_Comedy'] = test['Movie_Genres'].apply(mf.makeGenreBoolean, args=('Genre_Comedy',))
+test['Genre_Action_Adventure'] = test['Movie_Genres'].apply(mf.makeGenreBoolean, args=('Genre_Action_Adventure',))
+test['Genre_Thriller_Horror'] = test['Movie_Genres'].apply(mf.makeGenreBoolean, args=('Genre_Thriller_Horror',))
+test['Genre_Romance'] = test['Movie_Genres'].apply(mf.makeGenreBoolean, args=('Genre_Romance',))
+test['Genre_Crime_Mystery'] = test['Movie_Genres'].apply(mf.makeGenreBoolean, args=('Genre_Crime_Mystery',))
+test['Genre_Animation'] = test['Movie_Genres'].apply(mf.makeGenreBoolean, args=('Genre_Animation',))
+test['Genre_Scifi'] = test['Movie_Genres'].apply(mf.makeGenreBoolean, args=('Genre_Scifi',))
+test['Genre_Documentary'] = test['Movie_Genres'].apply(mf.makeGenreBoolean, args=('Genre_Documentary',))
+test['Genre_Other'] = test['Movie_Genres'].apply(mf.makeGenreBoolean, args=('Genre_Other',))
+
+
+# =============================================================================
+# Commented-out code below gets list of all unique Ratings in dataset, if needed.
+# Rest of code converts ratings into boolean-type columns.
+# =============================================================================
+
+##movies_working_set['Movie_Genres'] = movies_working_set['Movie_Genres'].apply(set)
+#listRatings = list(movies_working_set['Rated'].unique())
+#movies_working_set.groupby(['Rated']).size()
+#
+#test = movies_working_set.copy(deep=True)
+test['Rated_G_PG'] = 0
+test['Rated_PG-13'] = 0
+test['Rated_R'] = 0
+test['Rated_Other'] = 0
+
+test['Rated_G_PG'] = test['Rated'].apply(mf.makeRatedBoolean, args=('Rated_G_PG',))
+test['Rated_PG-13'] = test['Rated'].apply(mf.makeRatedBoolean, args=('Rated_PG-13',))
+test['Rated_R'] = test['Rated'].apply(mf.makeRatedBoolean, args=('Rated_R',))
+test['Rated_Other'] = test['Rated'].apply(mf.makeRatedBoolean, args=('Rated_Other',))
+
+# =============================================================================
+# Limit list of actors to just 5 entries
+# =============================================================================
+
+#test['Actors'] = []
+test['Actors'] = test['Movie_Actors'].apply(mf.limitNumActors, args=(5,))
+
+
+# =============================================================================
+# Create columns to split up Awards column.
+# =============================================================================
+
+listAwards= list(movies_working_set['Awards'].unique())
+
+test['Nominated_Major']=0
+test['Won_Major']=0
+test['Nominated_Minor']=0
+test['Won_Minor']=0
+
+test['Nominated_Major']=test['Awards'].apply(mf.getAwards, args=('majorNod',))
+test['Won_Major']=test['Awards'].apply(mf.getAwards, args=('majorWin',))
+test['Nominated_Minor']=test['Awards'].apply(mf.getAwards, args=('minorNod',))
+test['Won_Minor']=test['Awards'].apply(mf.getAwards, args=('minorWin',))
+
+# =============================================================================
+# Commented-out code below gets list of all unique production companies in dataset, if needed
+# Rest of code converts list of companies into boolean-type columns for major companies
+# =============================================================================
+
+listCompanies = list((set.union(*movies_working_set['Movie_Companies'].apply(set).tolist())))
+#test=movies_working_set.join(movies_working_set.Movie_Genres.str.join('|').str.get_dummies())
+#test[['Action','Adventure','Animation','Biography','Comedy','Crime', \
+#       'Documentary','Drama','Family','Fantasy','Foreign','Game-Show', \
+#       'History','Horror','Music','Musical','Mystery','News','Reality-TV', \
+#       'Romance','Sci-Fi','Science Fiction','Short','Sport','TV Movie', \
+#       'Thriller','War','Western']].sum().sort_values()
+#test[listGenres].sum().sort_values()         
+        
+        
+        
+        

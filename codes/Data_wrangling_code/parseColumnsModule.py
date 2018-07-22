@@ -13,12 +13,15 @@ import ast
 import re
 import movieFunctions as mf
 
+#Comments below reflect how the functions used were constructed.
+#To see functions, go to movieFunctions.py
+
 def parseColumns(x):
 
     # =============================================================================
     # Ratings dicts to columns
     # 
-    # The conditions in the if statements below are necessary
+    # The conditions in the if statements of the function below are necessary
     # to take care of some strange data in genre columns before
     # sending data to the ast.literal_eval function.
     # =============================================================================
@@ -30,7 +33,7 @@ def parseColumns(x):
     # =============================================================================
     # Genre dicts to list
     # 
-    # The conditions in the if statements below are necessary
+    # The conditions in the if statements of the function below are necessary
     # to take care of some strange data in genre columns before
     # sending data to the ast.literal_eval function.
     # =============================================================================
@@ -43,7 +46,7 @@ def parseColumns(x):
     # Production companies dicts to list
     # 
     # Lots of strange/odd data in production company columns.
-    # All the conditions in the if statements below are necessary
+    # All the conditions in the if statements of the function below are necessary
     # to take care of them before sending data to 
     # the ast.literal_eval function.
     # =============================================================================
@@ -63,7 +66,7 @@ def parseColumns(x):
     # =============================================================================
     # Cast dicts to list
     # 
-    # The conditions in the if statements below are necessary
+    # The conditions in the if statements of the function below are necessary
     # to take care of them before sending data to 
     # the ast.literal_eval function.
     # =============================================================================
@@ -75,7 +78,7 @@ def parseColumns(x):
     # =============================================================================
     # Keywords dicts to list
     # 
-    # The conditions in the if statements below are necessary
+    # The conditions in the if statements of the function below are necessary
     # to take care of them before sending data to 
     # the ast.literal_eval function.
     # =============================================================================

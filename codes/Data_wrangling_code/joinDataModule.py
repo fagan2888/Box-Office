@@ -148,5 +148,3 @@ def joinData():
     ##########Might need to run The Numbers data through APIs!!!!!!!!!!!!
     return movies_full
     
-if __name__ == "__main__":
-    joinData()
