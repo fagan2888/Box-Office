@@ -281,8 +281,8 @@ def getMoviePop(x, columns):
 
 
 # =============================================================================
-# This third set of functions are used to convert certain columns into usable
-# features in regression/classification models
+# This third set of functions are used to convert certain columns into usable, 
+# numerical features for regression/classification models
 # =============================================================================    
     
 def makeGenreBoolean(x, genre):
@@ -376,7 +376,7 @@ def limitNumActors(x, number):
 def getAwards(x, awardType):
     #Awards column follows a similar pattern across all movies:
     #If the movie was nominated or won for a major award,
-    #it will be stated in the first of two sentences.
+    #it will be stated in the first of 2 sentences.
     #The other minor award nominations and/or wins will be
     #in the second sentence.
     #Else, if the movie was only nominated or won for 
@@ -388,7 +388,7 @@ def getAwards(x, awardType):
     minorWin = 0
     
     if type(x)==str:
-        #If 2 sentences, Indicates movie won/nominated for major award
+        #If 2 sentences, Indicates movie won/nominated for major awards AND minor awards
         if len(x.split(". ")) == 2:
             majorAwards = x.split(". ")[0].split(" ")
             if 'Nominated' in majorAwards:
@@ -450,6 +450,149 @@ def getAwards(x, awardType):
         return minorWin
     
     
+def isCollection(x):
+    if len(x)>0:
+        return 1
+    else:
+        return 0
 
 
-              
+def getSeason(x, season):
+    if season == "Winter":
+        if x.month == 1 and x.day>=5:
+            return 1
+        elif x.month == 2:
+            return 1
+        else:
+            return 0
+    if season == "Spring":
+        if x.month == 3 or x.month == 4:
+            return 1
+        else:
+            return 0
+    if season == "Summer":
+        if x.month == 5 or x.month == 6 or x.month == 7 or x.month == 8:
+            return 1
+        elif x.month == 9 and x.day < 5:
+            return 1
+        else:
+            return 0
+    if season == "Fall":
+        if x.month == 9 and x.day >= 5:
+            return 1
+        elif x.month == 10:
+            return 1
+        else:
+            return 0
+    if season == "Holiday":
+        if x.month == 11 or x.month == 12:
+            return 1
+        elif x.month == 1 and x.day<5:
+            return 1
+        else:
+            return 0
+
+
+def getProfitBucket(x, deflate):
+    bucket = float('nan')
+   
+    revenue = x['Movie_Revenue']
+    budget = x['Movie_Budget']
+    
+    if revenue>0 and budget>0:
+        percentage = revenue/budget
+
+        if percentage<1:
+            bucket = '<1x'
+        elif percentage>=1 and percentage<2:    
+            bucket = '[1-2x)'        
+        elif percentage>=2 and percentage<3:
+            bucket = '[2-3x)'        
+        elif percentage>=3 and percentage<4:
+            bucket = '[3-4x)'        
+        elif percentage>=4 and percentage<5: 
+            bucket = '[4-5x)'        
+        elif percentage>=5:              
+            bucket = '>=5x'            
+
+    return bucket
+
+def getProfitBucketBinary(x, deflate, bucket):
+    
+    revenue = x['Movie_Revenue']
+    budget = x['Movie_Budget']
+    
+    if revenue>0 and budget>0:
+        percentage = revenue/budget
+        if bucket=='1x':
+            if percentage<1:
+                return 1
+            else:
+                return 0
+        elif bucket=='2x':
+            if percentage>=1 and percentage<2:
+                return 1    
+            else:
+                return 0            
+        elif bucket=='3x':
+            if percentage>=2 and percentage<3:
+                return 1 
+            else:
+                return 0            
+        elif bucket=='4x':
+            if percentage>=3 and percentage<4:
+                return 1     
+            else:
+                return 0            
+        elif bucket=='5x':
+            if percentage>=4 and percentage<5:
+                return 1  
+            else:
+                return 0            
+        elif bucket=='5x+':
+            if percentage>=5:
+                return 1              
+            else:
+                return 0            
+    else:
+        return 0 
+
+def deflate(x, variableToDeflate, cpi):
+    feature = variableToDeflate
+    deflated = float('nan')
+    
+    if pd.notna(x[feature]):
+        
+        index = cpi[(cpi.index.month==x['Movie_Date'].month) & (cpi.index.year==x['Movie_Date'].year)][0]
+        deflated = x[feature]/index
+        
+    return deflated
+
+def getMajorCompanies(x, companies_list, major_company):
+
+    found = 0
+    if major_company != 'Other':
+        #look through list of companies in each row of movies dataframe
+        #and see if it matches one of the companies belonging to the specified
+        #major production company dataset
+        for company in companies_list[companies_list['major']==major_company]['company']:
+            if company in x:
+                found = 1
+    #Set new company_other column equal to 1 if we have no
+    #production companies listed for a given movie or if comopany is not one of the majors            
+    elif major_company =='Other' and len(x)==0:
+        found = 1
+    else:
+        for company in companies_list[companies_list['major'].isnull()]['company']:
+            if company in x:
+                found = 1                   
+    return found        
+
+
+def fillPlot(x, copyCol, pasteCol):
+        
+    if pd.isnull(x[pasteCol]) and pd.notna(x[copyCol]):
+        return x[copyCol]
+    else:
+        return x[pasteCol]        
+            
