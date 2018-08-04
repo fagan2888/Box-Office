@@ -19,8 +19,9 @@ import movieFunctions as mf
 import joinDataModule as jd
 import parseColumnsModule as pc
 import mergeDataModule as md
-
-
+import pandas_datareader as pdr
+import pandas.io.sql as pd_sql
+import sqlite3 as sql
 
 
 # =============================================================================
@@ -111,8 +112,10 @@ movies_2013_2010.to_csv(r'c:\users\rebecca\desktop\movies_2013_2010.csv')
 movies_2009_2008.to_csv(r'c:\users\rebecca\desktop\movies_2009_2008.csv')
 movies_2007_1995.to_csv(r'c:\users\rebecca\desktop\movies_2007_1995.csv')
 
+movies_working_set_rebuilt.to_csv(r'c:\users\rebecca\desktop\movies_working_set_rebuilt.csv')
+
 # =============================================================================
-# #Count the number of missing values in each important column, if necessary
+# Use if need count of missing values in each important column
 # =============================================================================
 print("Awards", len(movies_working_set)-(movies_working_set['Awards']).count())
 print("Plot", len(movies_working_set)-(movies_working_set['Plot']).count())
@@ -143,15 +146,136 @@ print("Meta", len(movies_working_set)- (movies_working_set['Movie_Rating_Metacri
 # ####SECTION 2
 # ####This second part collects team members efforts to fill in missing data.
 # =============================================================================
-
-
 movies_2018 = pd.read_csv(r'c:\users\rebecca\desktop\movies\FilledIn\movies_2018.csv', encoding = 'latin-1')
+movies_2017 = pd.read_csv(r'c:\users\rebecca\desktop\movies\FilledIn\movies_2017.csv', encoding = 'latin-1')
 movies_2016 = pd.read_csv(r'c:\users\rebecca\desktop\movies\FilledIn\movies_2016.csv', encoding = 'latin-1')
 movies_2015_2014 = pd.read_csv(r'c:\users\rebecca\desktop\movies\FilledIn\movies_2015_2014.csv', encoding = 'latin-1')
+movies_2013_2010 = pd.read_csv(r'c:\users\rebecca\desktop\movies\FilledIn\movies_2013_2010.csv', encoding = 'latin-1')
 movies_2009_2008 = pd.read_csv(r'c:\users\rebecca\desktop\movies\FilledIn\movies_2009_2008.csv', encoding = 'latin-1')
+movies_2007_1995 = pd.read_csv(r'c:\users\rebecca\desktop\movies\FilledIn\movies_2007_1995.csv', encoding = 'latin-1')
 
-movies_working_set_rebuilt=pd.concat([movies_2018, movies_2016, movies_2015_2014, movies_2009_2008])
+
+movies_working_set_rebuilt=pd.concat([movies_2018, movies_2017, movies_2016, \
+                                      movies_2015_2014, movies_2013_2010, movies_2009_2008, movies_2007_1995])
+# =============================================================================
+# #Fixes human error issues
+# =============================================================================
 movies_working_set_rebuilt=movies_working_set_rebuilt.drop(columns=['Unnamed: 0'])
+movies_working_set_rebuilt.reset_index(drop=True, inplace=True)
+#Blank row
+movies_working_set_rebuilt.drop(movies_working_set_rebuilt.index[958], inplace=True)
+movies_working_set_rebuilt.reset_index(drop=True, inplace=True)
+#Actors filled in wrong column
+movies_working_set_rebuilt['Movie_Actors'][3138] = movies_working_set_rebuilt['Movie_Companies'][3138]
+movies_working_set_rebuilt['Movie_Companies'][3138] = '[]'
+#Blank movie collection cell
+movies_working_set_rebuilt['Movie_Collection'][259] ='[]'
+#Fix genre
+movies_working_set_rebuilt['Movie_Genres'][2246] = "['Comedy', 'Horror', 'Sci-Fi']"
+movies_working_set_rebuilt['Movie_Genres'][2686] = "['Horror', 'Thriller']"
+movies_working_set_rebuilt['Movie_Genres'][2689] = "['Drama', 'History', 'War']"
+movies_working_set_rebuilt['Movie_Genres'][2695] = "['Biography', 'Comedy', 'Drama']"
+movies_working_set_rebuilt['Movie_Genres'][2761] = "['Action', 'Thriller']"
+movies_working_set_rebuilt['Movie_Genres'][2818] = "['Drama', 'History', 'Romance']"
+movies_working_set_rebuilt['Movie_Genres'][2832] = "['Action', 'Sport']"
+movies_working_set_rebuilt['Movie_Genres'][2998] = "['Crime', 'Drama', 'Thriller']"
+movies_working_set_rebuilt['Movie_Genres'][3041] = "['Comedy', 'Thriller']"
+movies_working_set_rebuilt['Movie_Genres'][3110] = "['Documentary', 'Comedy']"
+movies_working_set_rebuilt['Movie_Genres'][3145] = "['Drama', 'History','War']"
+movies_working_set_rebuilt['Movie_Genres'][3169] = "['Action', 'Drama', 'Horror']"
+movies_working_set_rebuilt['Movie_Genres'][3203] = "['Drama', 'Romance']"
+movies_working_set_rebuilt['Movie_Genres'][3244] = "['Biography', 'Drama', 'History']"
+
+#Fix movie companies
+movies_working_set_rebuilt['Movie_Companies'][2121] = "['Quatsous Films', 'Wild Bunch', 'France 2 Cinéma']"
+movies_working_set_rebuilt['Movie_Companies'][2245] = "['Final Cut for Real', 'Piraya Film A/S', 'Novaya Zemlya']"
+movies_working_set_rebuilt['Movie_Companies'][2831]= "['Eden Films', 'Phoenix Wiley']"
+movies_working_set_rebuilt['Movie_Companies'][2916] = "['Reliance Big Pictures', 'Loubyloo Productions', 'Eden Rock Media']"
+movies_working_set_rebuilt['Movie_Companies'][3239] = "['EuropaCorp', 'Mad Chance']"
+
+#Fix movie actors
+movies_working_set_rebuilt['Movie_Actors'][197] = "['Ava Cooper', 'Ben Foster', 'Christian Bale', 'David Midthunder', 'Gray Wolf Herrera', 'Jesse Plemons', 'John Benjamin Hickey', 'Jonathan Majors', 'Paul Anderson', 'Peter Mullan', 'Qorianka Kilcher', 'Rory Cochrane', 'Rosamund Pike', 'Scott Shepherd', 'Scott Wilson', 'Stella Cooper', 'Stephen Lang', 'Timoth', 'Wes Studi']"
+movies_working_set_rebuilt['Movie_Actors'][198] = "['Al Pacino', 'Brittany Snow', 'Chelle Ramos', 'Jermaine Rivers', 'Joe Anderson', 'Jules Haven', 'Karl Urban',' Matt Mercurio', 'Michael Papajohn', 'Odessa Rae', 'Sarah Shahi', 'Steve Coulter', 'Viviana Chavez']"
+movies_working_set_rebuilt['Movie_Actors'][880] = "['Jennifer Hale', 'Rapahel Sbarge']"
+movies_working_set_rebuilt['Movie_Actors'][905] = "['Cat Brooks', 'Jonathan Cairo', 'Ben McBride','Johnna Watson', 'Sean Whent', 'Juan Carolos Zapta']"
+movies_working_set_rebuilt['Movie_Actors'][949] = "['Meryl Steep', 'Tom Hanks', 'Sarah Paulson', ' Bob Odenkirk' , 'Tracy Letts']"
+movies_working_set_rebuilt['Movie_Actors'][2556] = "['Ranbir Kapoor', 'Priyanka Chopra', 'Ileana DCruz']"
+movies_working_set_rebuilt['Movie_Actors'][2689] = "['Mauricio Kuri', 'Adrian Alonso','Rubén Blades']"
+movies_working_set_rebuilt['Movie_Actors'][2695] = "['François Cluzet', 'Omar Sy']"
+movies_working_set_rebuilt['Movie_Actors'][2801] = "['Neil Masketll', 'MyAnna Buring', 'Harry Simpson']"
+movies_working_set_rebuilt['Movie_Actors'][3041] = "['David Hyde Pierce', 'Clayne Crawford', 'Nathaniel Parker']"
+movies_working_set_rebuilt['Movie_Actors'][3112] = "['Abhishek Bachchan', 'Deepika Padukone', 'Bipasha Basu']"
+movies_working_set_rebuilt['Movie_Actors'][3127] = "['Michelle Williams', 'Bruce Greenwood', 'Paul Dano']"
+movies_working_set_rebuilt['Movie_Actors'][3560] = "['Jennifer Aniston', 'Steve Zahn', 'Woody Harrelson', 'Fred Ward', 'Margo Martindale', 'Kevin Heffernan', 'James Hiroyuki Liao', 'Katie OGrady', 'Yolanda Suarez', 'Don Burns', 'Kimberly Howard', 'Collin Crowley', 'Gilberto Martin del Campo', 'Mark Boone Junior', 'Garfield Wedderburn']"
+movies_working_set_rebuilt['Movie_Actors'][3906] = "['Diane Lane', 'Billy Burke', 'Colin Hanks', 'Joseph Cross', 'Mary Beth Hurt', 'Peter Lewis', 'Perla Haney-Jardine', 'Tim DeZam', 'Christopher Cousins', 'Jesse Tyler Ferguson', 'Brynn Baron', 'John Breen', 'Dan Callahan', 'Tyrone Giordano', 'Erin Carufel', 'Ryan Deal', 'Betty Moyer', 'Katie OGrady']"
+
+#Fix movie keywords
+movies_working_set_rebuilt['Movie_Keywords'][128] = "['based on novel', 'coma', 'expedition', 'doppleganger', 'lighthouse']"
+movies_working_set_rebuilt['Movie_Keywords'][199] = "['fool', 'chump', 'craziness', 'silliness', 'idiot']"
+movies_working_set_rebuilt['Movie_Keywords'][206] = "['jungle', 'leg', 'legs', 'pretty legs', 'girl wearing shorts']"
+movies_working_set_rebuilt['Movie_Keywords'][267] = "['female frontal nudity', 'dysfunctional family', 'nudity', 'female nudity', 'bare breasts']"
+movies_working_set_rebuilt['Movie_Keywords'][283] = "['husband wife relationship', 'inventor', 'wheelchair', 'kenya', 'hospital']"
+movies_working_set_rebuilt['Movie_Keywords'][297] = "['wildfire', 'firefighter', 'forest fire', 'natural disaster', 'helicopter']"
+movies_working_set_rebuilt['Movie_Keywords'][315] = "['crying', 'flashback', 'snow', 'snowboarding', 'skier']"
+movies_working_set_rebuilt['Movie_Keywords'][389] = "['blonde woman', 'lbd', 'older woman younger man sex', 'man checking out womans behind', 'girl wearing a mini skirt']"
+movies_working_set_rebuilt['Movie_Keywords'][556] = "['army', 'war', 'adventure']"
+movies_working_set_rebuilt['Movie_Keywords'][885] = "['doctor', 'aliens']"
+movies_working_set_rebuilt['Movie_Keywords'][949] = "['newspaper', 'pentagon papers', 'whistleblower', '1970s']"
+movies_working_set_rebuilt['Movie_Keywords'][2212] = "['ip man character', 'falling off a balcony', 'girl',  'crying',  'starving to death']"
+movies_working_set_rebuilt['Movie_Keywords'][2247] = "['movie poster', 'documentary subjects name in title']"
+movies_working_set_rebuilt['Movie_Keywords'][2512] = "['strip club', 'c word', 'interrupted sex', 'breaking a bottle over someones head', 'female rear nudity']"
+movies_working_set_rebuilt['Movie_Keywords'][2523] = "['slow motion action scene', 'bloody spray', 'extreme blood', 'extreme violence', 'ultra slow motion', 'gore', 'gruesome']"
+movies_working_set_rebuilt['Movie_Keywords'][2686] = "['prom', 'escape', 'high school','prom king', 'high school prom']"
+movies_working_set_rebuilt['Movie_Keywords'][2689] = "['fanatic', 'arm belt']"
+movies_working_set_rebuilt['Movie_Keywords'][2695] = "['class differences', 'black white friendship', 'caregiver', 'paralysis','rich poor']"
+movies_working_set_rebuilt['Movie_Keywords'][2778] = "['tree', 'creature', 'forest',  'city', 'walled city']"
+movies_working_set_rebuilt['Movie_Keywords'][2834] = "['iran', 'divorce','alzheimers disease', 'court', 'marital problem']"
+movies_working_set_rebuilt['Movie_Keywords'][2886] = "['coach', 'basketball', 'league', 'sister']"
+movies_working_set_rebuilt['Movie_Keywords'][2897] = "['aunt', 'author', 'confusion', 'abusive father', 'alcoholism']"
+movies_working_set_rebuilt['Movie_Keywords'][2906] = "['mauser pistol', 'mauser', 'chinese history']"
+movies_working_set_rebuilt['Movie_Keywords'][2947] = "['romantic triangle', 'female nudity', 'menage a trois', 'male nudity']"
+movies_working_set_rebuilt['Movie_Keywords'][3081] = "['vomiting','male objectification' , 'male in underwear']"
+movies_working_set_rebuilt['Movie_Keywords'][3101] = "['murder', 'revenge', 'fight', 'killing']"
+movies_working_set_rebuilt['Movie_Keywords'][3138] = "['Maine','FBI agent', 'supernatural']"
+movies_working_set_rebuilt['Movie_Keywords'][3214] = "['hero', 'revenge']"
+movies_working_set_rebuilt['Movie_Keywords'][3244] = "['period drama', 'speech therapist', 'speech impediment', 'king george vi', 'king george vi character']"
+
+#Fix movie colleciton
+movies_working_set_rebuilt['Movie_Collection'][261] = "['Remake']"
+movies_working_set_rebuilt['Movie_Collection'][291]  = "['Tyler Perry', 'Madeas']"
+movies_working_set_rebuilt['Movie_Collection'][326] = "['My Little Pony by Hasbro']"
+movies_working_set_rebuilt['Movie_Collection'][329] = "['Blade Runner']"
+movies_working_set_rebuilt['Movie_Collection'][364] = "['Kingsman']"
+movies_working_set_rebuilt['Movie_Collection'][886] = "['Resident Evil collections']"
+movies_working_set_rebuilt['Movie_Collection'][2109] = "['night of the living dead']"
+
+#Fix Movie Director
+movies_working_set_rebuilt['Movie_Director'][559] = "['Tim Smit']"
+movies_working_set_rebuilt['Movie_Director'][888] = "['Ryan Graves']"
+movies_working_set_rebuilt['Movie_Director'][2404] = "['Remo DSouza']"
+movies_working_set_rebuilt['Movie_Director'][3002] = "['Alex Timbers','Kelly Reichardt']"
+movies_working_set_rebuilt['Movie_Director'][3067]= "['Mike Mills']"
+movies_working_set_rebuilt['Movie_Director'][3274] = "[]"
+
+#Fix Movie Writer
+movies_working_set_rebuilt['Movie_Writer'][2355]  = "['Conor McMahon', 'David OBrien']"
+movies_working_set_rebuilt['Movie_Writer'][2404] = "['Amit Aryan', 'Remo DSouza']"
+movies_working_set_rebuilt['Movie_Writer'][2778] = "['Dr. Seuss', 'Cinco Paul']"
+movies_working_set_rebuilt['Movie_Writer'][3067] = "['Mike Mills']"
+movies_working_set_rebuilt['Movie_Writer'][3101] = "['Kaneo Ikegami']"
+movies_working_set_rebuilt['Movie_Writer'][3274] = "[]"
+
+#Fix movie producer
+movies_working_set_rebuilt['Movie_Producer'][1990] = "['Patrick OBrien', 'Mark Sourian', 'John Gatins']"
+movies_working_set_rebuilt['Movie_Producer'][2727] = "['Marianne Gray']"
+movies_working_set_rebuilt['Movie_Producer'][2947] = "['Stefan Arndt']"
+movies_working_set_rebuilt['Movie_Producer'][3224] = "['Sergey Zernov']"
+movies_working_set_rebuilt['Movie_Producer'][3274] = "[]"
+
 movies_working_set_rebuilt.reset_index(drop=True, inplace=True)
 
 
+con = sql.connect('movies.db') 
+movies_working_set_rebuilt.to_sql('cleanedMovies_20180803', con)
+con.commit()
+con.close()

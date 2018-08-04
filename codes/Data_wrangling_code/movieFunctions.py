@@ -149,7 +149,7 @@ def isfloat(value):
   try:
     float(value)
     return True
-  except ValueError:
+  except ValueError or TypeError:
     return False
 
 def getMovieBudget(x, columns):
@@ -613,12 +613,13 @@ def sumRevenue(data, column, sumColumn, sumColumn_real):
         
         for person in data[column][index]:       
             for row in range(len(subset)): 
-                if person.lower() in (perc.lower() for perc in subset[column][row]): 
+                if person in subset[column][row]:#if person.lower() in (perc.lower() for perc in subset[column][row]): 
                     if pd.notna(subset[revenueColumn][row]):
                         revenue = revenue + subset[revenueColumn][row]
                         revenue_real = revenue_real + subset[revenueColumn_real][row]
-   
+        #print(revenue)                
         if revenue>0:
+            #print(revenue)
             data[sumColumn][index]= revenue
             data[sumColumn_real][index]= revenue_real
                 

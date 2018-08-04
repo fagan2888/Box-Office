@@ -24,18 +24,23 @@ companies = pd.read_csv(r'c:\users\rebecca\desktop\movies\companies\production_c
 # =============================================================================
 # This code takes our dataset and modifies some of the text and/or categorical
 # and/or list columns into binary columns more usable in machine learning models.
+# First drop any rows team members flagged to delete.
+
 # =============================================================================
 
-
+test = movies_working_set_rebuilt.copy(deep=True)
+test = test[test['Delete']!=1]
+test.reset_index(drop=True, inplace=True)
 # =============================================================================
 # Commented-out code below gets list of all unique genre types in dataset, if needed.
 # Rest of code converts list of genres into boolean-type columns for major genres.
 # =============================================================================
 
-#listGenres = list((set.union(*movies_working_set['Movie_Genres'].apply(set).tolist())))
+#listGenres = list((set.union(*movies_working_set_rebuilt['Movie_Genres'].apply(set).tolist())))
 
 #test[listGenres].sum().sort_values()
-test = movies_working_set.copy(deep=True)
+
+test['Movie_Genres'] = test['Movie_Genres'].apply(ast.literal_eval)
 
 test['Genre_Drama'] = test['Movie_Genres'].apply(mf.makeGenreBoolean, args=('Genre_Drama',))
 test['Genre_Comedy'] = test['Movie_Genres'].apply(mf.makeGenreBoolean, args=('Genre_Comedy',))
@@ -55,14 +60,18 @@ print("Finished encoding genre")
 # Rest of code converts ratings into boolean-type columns.
 # =============================================================================
 
-##movies_working_set['Movie_Genres'] = movies_working_set['Movie_Genres'].apply(set)
-#listRatings = list(movies_working_set['Rated'].unique())
-#movies_working_set.groupby(['Rated']).size()
+##movies_working_set_rebuilt['Movie_Genres'] = movies_working_set_rebuilt['Movie_Genres'].apply(set)
+#listRatings = list(movies_working_set_rebuilt['Rated'].unique())
+#movies_working_set_rebuilt.groupby(['Rated']).size()
 
 test['Rated_G_PG'] = test['Rated'].apply(mf.makeRatedBoolean, args=('Rated_G_PG',))
 test['Rated_PG-13'] = test['Rated'].apply(mf.makeRatedBoolean, args=('Rated_PG-13',))
 test['Rated_R'] = test['Rated'].apply(mf.makeRatedBoolean, args=('Rated_R',))
 test['Rated_Other'] = test['Rated'].apply(mf.makeRatedBoolean, args=('Rated_Other',))
+
+test['Rated_category'] = test['Rated'].apply(lambda x: "Other" if (x != 'PG-13' \
+    and x!='G' and x!='PG' and x!='R') else x)
+
 
 print("Finished encoding rating")
 
@@ -70,6 +79,7 @@ print("Finished encoding rating")
 # =============================================================================
 # Limit list of actors to just 5 entries
 # =============================================================================
+test['Movie_Actors'] = test['Movie_Actors'].apply(ast.literal_eval)
 
 test['Actors'] = test['Movie_Actors'].apply(mf.limitNumActors, args=(5,))
 
@@ -80,7 +90,7 @@ print("Finished reducing # actors")
 # Create columns to split up Awards column.
 # =============================================================================
 
-#listAwards= list(movies_working_set['Awards'].unique())
+#listAwards= list(movies_working_set_rebuilt['Awards'].unique())
 
 test['Nominated_Major']=test['Awards'].apply(mf.getAwards, args=('majorNod',))
 test['Won_Major']=test['Awards'].apply(mf.getAwards, args=('majorWin',))
@@ -93,6 +103,7 @@ print("Finished encoding awards")
 # =============================================================================
 # Create boolean to indicate whether movie is part of collection.
 # =============================================================================
+test['Movie_Collection'] = test['Movie_Collection'].apply(ast.literal_eval)
 
 test['isCollection'] = test['Movie_Collection'].apply(mf.isCollection)
 
@@ -103,11 +114,17 @@ print("Finished encoding collection")
 # Create seasonal dummies for release date.
 # =============================================================================
         
+test['Movie_Date']=pd.to_datetime(test['Movie_Date'])
+
 test['Winter']=test['Movie_Date'].apply(mf.getSeason, args=('Winter',))
 test['Spring']=test['Movie_Date'].apply(mf.getSeason, args=('Spring',))
 test['Summer']=test['Movie_Date'].apply(mf.getSeason, args=('Summer',))
 test['Fall']=test['Movie_Date'].apply(mf.getSeason, args=('Fall',))
 test['Holiday']=test['Movie_Date'].apply(mf.getSeason, args=('Holiday',))
+#create categorical season
+test['Season']=np.where(test['Winter']==1, "Winter", np.where(test['Spring']==1, \
+    "Spring", np.where(test['Summer']==1, "Summer", np.where(test['Fall']==1, \
+                       "Fall", np.where(test['Holiday']==1, "Holiday", "")))))
 
 print("Finished encoding season")
 
@@ -155,7 +172,10 @@ print("Finished deflating rev/budget")
 # Rest of code converts list of companies into boolean-type columns for major companies
 # =============================================================================
 
-#listCompanies = list((set.union(*movies_working_set['Movie_Companies'].apply(set).tolist())))
+#test = movies_working_set_rebuilt[pd.notna(movies_working_set_rebuilt['Movie_Companies'])]
+#listCompanies = list((set.union(*test['Movie_Companies'].apply(set).tolist())))
+
+test['Movie_Companies'] = test['Movie_Companies'].apply(ast.literal_eval)
 
 test['Comp_Disney'] = test['Movie_Companies'].apply(mf.getMajorCompanies, args=(companies, 'Disney',))        
 test['Comp_DreamWorks'] = test['Movie_Companies'].apply(mf.getMajorCompanies, args=(companies, 'DreamWorks',))        
@@ -183,10 +203,27 @@ test['Movie_Overview']=test.apply(mf.fillPlot, args=('Plot', 'Movie_Overview',),
 
 print("Finished filling up plot/overview")
 
+
+# =============================================================================
+# Short function convert string to numerical column
+# =============================================================================
+
+test['imdbVotes'] = test['imdbVotes'].str.replace(',', '')
+test['imdbVotes']=test['imdbVotes'].apply(lambda x: float(x) if mf.isfloat(x) is True else x)
+
+test['Rating_RT'] = test['Rating_RT'].str.replace('%', '')
+test['Rating_RT']=test['Rating_RT'].apply(lambda x: float(x) if (type(x)==str) else x)
+
+print("Finished converting to float")
+
 # =============================================================================
 # Sum revenue of movies the listed actors generated in previous movies
 # =============================================================================
+test['Movie_Director'] = test['Movie_Director'].apply(ast.literal_eval)
+test['Movie_Writer'] = test['Movie_Writer'].apply(ast.literal_eval)
+test['Movie_Producer'] = test['Movie_Producer'].apply(ast.literal_eval)
 
+###???????Should it be NAN or zero????
 test['Revenue_Actor'] = float('nan')
 test['Revenue_Actor_Real'] = float('nan')
 test['Revenue_Director'] = float('nan')
@@ -196,16 +233,19 @@ test['Revenue_Writer_Real'] = float('nan')
 test['Revenue_Producer'] = float('nan')
 test['Revenue_Producer_Real'] = float('nan')
 
-##test['Actor_Revenue'] = test.apply(mf.sumActorRevenue)
-#test=mf.sumRevenue(test, 'Actors', 'Revenue_Actor', 'Revenue_Actor_Real')
-#test=mf.sumRevenue(test, 'Movie_Director', 'Revenue_Director', 'Revenue_Director_Real')
-#test=mf.sumRevenue(test, 'Movie_Writer', 'Revenue_Writer', 'Revenue_Writer_Real')
-#test=mf.sumRevenue(test, 'Movie_Producer', 'Revenue_Producer', 'Revenue_Producer_Real')
+mf.sumRevenue(test, 'Actors', 'Revenue_Actor', 'Revenue_Actor_Real')
+print("Finished summing up actor revenues")
+mf.sumRevenue(test, 'Movie_Director', 'Revenue_Director', 'Revenue_Director_Real')
+print("Finished summing up director revenues")
+mf.sumRevenue(test, 'Movie_Writer', 'Revenue_Writer', 'Revenue_Writer_Real')
+print("Finished summing up writer revenues")
+mf.sumRevenue(test, 'Movie_Producer', 'Revenue_Producer', 'Revenue_Producer_Real')
+print("Finished summing up producer revenues")
 
-print("Finished summing up actor/dir/wri/prod revenues")
-
-        
-
+con = sql.connect('movies.db') 
+test.to_sql('preProcessMovies_20180803', con)
+con.commit()
+con.close()
 # =============================================================================
 # Save working dataset into SQLite database to start modeling.
 # =============================================================================
@@ -215,6 +255,11 @@ test[['Movie_Genres', 'Movie_Companies', 'Movie_Actors', 'Movie_Keywords', 'Movi
        'Movie_Director', 'Movie_Writer', 'Movie_Producer','Actors']] = \
        test[['Movie_Genres', 'Movie_Companies', 'Movie_Actors', 'Movie_Keywords', 'Movie_Collection', \
        'Movie_Director', 'Movie_Writer', 'Movie_Producer','Actors']].astype(str)
+       
+con = sql.connect('movies.db') 
+test.to_sql('preProcessMovies_20180804', con)
+con.commit()
+con.close()
 
 test.rename(columns={'rating': 'Rating_MovieLens', 'Movie_Name': 'Name', \
                       'Movie_Revenue': 'Revenue', 'Movie_Date': 'Date', \
@@ -227,8 +272,11 @@ test.rename(columns={'rating': 'Rating_MovieLens', 'Movie_Name': 'Name', \
                       'Movie_Producer': 'Producer', 'Movie_Rating_IMDB': 'Rating_IMDB', \
                       'Movie_Rating_Metacritic': 'Rating_Metacritic', 'Actors': 'Actors_short'}, inplace=True)
 
+test=test.drop(columns=['Delete'])
+
+
 con = sql.connect('movies.db') 
-test.to_sql('movies', con)
+test.to_sql('finalMovies_20180804', con)
 con.commit()
 con.close()
 #train = pd_sql.read_sql('select * from movies4', con, index_col='index')
