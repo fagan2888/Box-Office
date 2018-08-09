@@ -18,8 +18,15 @@ import pandas.io.sql as pd_sql
 import sqlite3 as sql
 #My own module:
 import movieFunctions as mf
+
+
+# =============================================================================
+# #File directories will likely need to be updated based on where they are stored on your computer
+# 
+# =============================================================================
+
 #Import production commpany lookup table for later use
-companies = pd.read_csv(r'c:\users\rebecca\desktop\movies\companies\production_companies.csv', encoding = 'latin-1')
+companies = pd.read_csv(r'~\projs\Box-Office\data\production_companies.csv', encoding = 'latin-1')
 
 # =============================================================================
 # This code takes our dataset and modifies some of the text and/or categorical
@@ -27,6 +34,9 @@ companies = pd.read_csv(r'c:\users\rebecca\desktop\movies\companies\production_c
 # First drop any rows team members flagged to delete.
 
 # =============================================================================
+
+con = sql.connect(r'c:\users\rebecca\projs\Box-Office\movies_dataset\movies.db') 
+movies_working_set_rebuilt = pd_sql.read_sql('select * from cleanedMovies_20180803', con, index_col='index')
 
 test = movies_working_set_rebuilt.copy(deep=True)
 test = test[test['Delete']!=1]
@@ -209,7 +219,7 @@ print("Finished filling up plot/overview")
 # =============================================================================
 
 test['imdbVotes'] = test['imdbVotes'].str.replace(',', '')
-test['imdbVotes']=test['imdbVotes'].apply(lambda x: float(x) if mf.isfloat(x) is True else x)
+test['imdbVotes']=test['imdbVotes'].apply(lambda x: float(x) if ( (x is not None)) else x)
 
 test['Rating_RT'] = test['Rating_RT'].str.replace('%', '')
 test['Rating_RT']=test['Rating_RT'].apply(lambda x: float(x) if (type(x)==str) else x)
@@ -223,7 +233,7 @@ test['Movie_Director'] = test['Movie_Director'].apply(ast.literal_eval)
 test['Movie_Writer'] = test['Movie_Writer'].apply(ast.literal_eval)
 test['Movie_Producer'] = test['Movie_Producer'].apply(ast.literal_eval)
 
-###???????Should it be NAN or zero????
+###Should it be NAN or zero?
 test['Revenue_Actor'] = float('nan')
 test['Revenue_Actor_Real'] = float('nan')
 test['Revenue_Director'] = float('nan')
@@ -232,7 +242,9 @@ test['Revenue_Writer'] = float('nan')
 test['Revenue_Writer_Real'] = float('nan')
 test['Revenue_Producer'] = float('nan')
 test['Revenue_Producer_Real'] = float('nan')
+print("Starting calculations on cast/crew revenue history")
 
+####Warning, these four functions will take between 1.5 - 2 hours to run.
 mf.sumRevenue(test, 'Actors', 'Revenue_Actor', 'Revenue_Actor_Real')
 print("Finished summing up actor revenues")
 mf.sumRevenue(test, 'Movie_Director', 'Revenue_Director', 'Revenue_Director_Real')
@@ -242,10 +254,12 @@ print("Finished summing up writer revenues")
 mf.sumRevenue(test, 'Movie_Producer', 'Revenue_Producer', 'Revenue_Producer_Real')
 print("Finished summing up producer revenues")
 
-con = sql.connect('movies.db') 
-test.to_sql('preProcessMovies_20180803', con)
-con.commit()
-con.close()
+##Add to database
+#con = sql.connect('movies.db') 
+#test.to_sql('preProcessMovies_20180803', con)
+#con.commit()
+#con.close()
+
 # =============================================================================
 # Save working dataset into SQLite database to start modeling.
 # =============================================================================
@@ -256,10 +270,11 @@ test[['Movie_Genres', 'Movie_Companies', 'Movie_Actors', 'Movie_Keywords', 'Movi
        test[['Movie_Genres', 'Movie_Companies', 'Movie_Actors', 'Movie_Keywords', 'Movie_Collection', \
        'Movie_Director', 'Movie_Writer', 'Movie_Producer','Actors']].astype(str)
        
-con = sql.connect('movies.db') 
-test.to_sql('preProcessMovies_20180804', con)
-con.commit()
-con.close()
+###Add to database       
+#con = sql.connect(r'c:\users\rebecca\projs\Box-Office\movies_dataset\movies.db') 
+#test.to_sql('preProcessMovies_20180804', con)
+#con.commit()
+#con.close()
 
 test.rename(columns={'rating': 'Rating_MovieLens', 'Movie_Name': 'Name', \
                       'Movie_Revenue': 'Revenue', 'Movie_Date': 'Date', \
@@ -274,10 +289,9 @@ test.rename(columns={'rating': 'Rating_MovieLens', 'Movie_Name': 'Name', \
 
 test=test.drop(columns=['Delete'])
 
-
-con = sql.connect('movies.db') 
-test.to_sql('finalMovies_20180804', con)
-con.commit()
-con.close()
-#train = pd_sql.read_sql('select * from movies4', con, index_col='index')
+###Add to database 
+#con = sql.connect('movies.db') 
+#test.to_sql('finalMovies_20180804', con)
+#con.commit()
+#con.close()
 

@@ -11,46 +11,52 @@ import json
 import requests
 import datetime
 from datetime import datetime
+import zipfile
+
 
 import time
 import sqlite3
 import matplotlib.pyplot as plt
 from pandas.io.json import json_normalize
 
+# =============================================================================
+# #File directories will likely need to be updated based on where files are stored on your computer
+# 
+# =============================================================================
+
 
 def joinData():
     
     # =============================================================================
     # #This code needs information from Kaggle dataset here: https://www.kaggle.com/rounakbanik/the-movies-dataset/data,
-    # #If you want to run this code, download that CSV and save it somewhere on your computer.
-    # #Replace this directory with the location where you saved the CSV file.
     # =============================================================================
-    movies = pd.read_csv(r'c:\users\rebecca\desktop\movies\TheMovies\movies_metadata.csv')
-    ratings = pd.read_csv(r'c:\users\rebecca\desktop\movies\TheMovies\ratings.csv')
-    movie_credits = pd.read_csv(r'c:\users\rebecca\desktop\movies\TheMovies\credits.csv')
-    keywords = pd.read_csv(r'c:\users\rebecca\desktop\movies\TheMovies\keywords.csv')
-    id_lookup= pd.read_csv(r'c:\users\rebecca\desktop\movies\TheMovies\links.csv')
+    movies = pd.read_csv(r"~\projs\Box-Office\data\movies_metadata.csv")
+    zf = zipfile.ZipFile(r"c:\users\rebecca\projs\Box-Office\data\ratings.zip")
+    ratings = pd.read_csv(zf.open('ratings.csv'))
+    zf = zipfile.ZipFile(r"c:\users\rebecca\projs\Box-Office\data\credits.zip")
+    movie_credits = pd.read_csv(zf.open('credits.csv'))
+    keywords = pd.read_csv(r'~\projs\Box-Office\data\keywords.csv')
+    id_lookup= pd.read_csv(r'~\projs\Box-Office\data\links.csv')
     print("Done loading Kaggle data part 1")
     
     
     # =============================================================================
     # #This code needs information from Kaggle dataset here: https://www.kaggle.com/tmdb/tmdb-movie-metadata/data,
-    # #If you want to run this code, download that CSV and save it somewhere on your computer.
     # =============================================================================
-    movies_tmdb = pd.read_csv(r'c:\users\rebecca\desktop\movies\TMDB\tmdb_5000_movies.csv')
-    credits_tmdb = pd.read_csv(r'c:\users\rebecca\desktop\movies\TMDB\tmdb_5000_credits.csv')
+    movies_tmdb = pd.read_csv(r'~\projs\Box-Office\data\tmdb_5000_movies.csv')
+    credits_tmdb = pd.read_csv(r'~\projs\Box-Office\data\tmdb_5000_credits.csv')
     print("Done loading Kaggle data part 2")
     
     
     # =============================================================================
     # #This code needs data pulled from OMDB API and TMDB API
     # =============================================================================
-    movies_omdbapi = pd.read_csv(r'c:\users\rebecca\desktop\movies\API\omdb_pull.csv')
-    movies_tmdbapi = pd.read_csv(r'c:\users\rebecca\desktop\movies\API\movies_tmdbapi_full.csv')
+    movies_omdbapi = pd.read_csv(r'~\projs\Box-Office\data\omdb_pull.csv')
+    movies_tmdbapi = pd.read_csv(r'~\projs\Box-Office\data\movies_tmdbapi_full.csv')
     movies_tmdbapi=movies_tmdbapi.drop(columns=['Unnamed: 0'])
     #genre_tmdbapi = pd.read_csv(r'c:\users\rebecca\desktop\movies\API\genre_ids.csv')
-    movies_tmdbapi_new =pd.DataFrame(pd.read_pickle(r'c:\users\rebecca\desktop\movies\API\movies_tmdbapi_full_new'))
-    movies_tmdbapi_theNumbers =pd.DataFrame(pd.read_pickle(r'c:\users\rebecca\desktop\movies\API\movies_tmdbapi_full_theNumbers'))    
+    movies_tmdbapi_new =pd.DataFrame(pd.read_pickle(r'c:\users\rebecca\projs\Box-Office\data\movies_tmdbapi_full_new'))
+    movies_tmdbapi_theNumbers =pd.DataFrame(pd.read_pickle(r'c:\users\rebecca\projs\Box-Office\data\movies_tmdbapi_full_theNumbers'))    
     movies_tmdbapi = movies_tmdbapi.append(movies_tmdbapi_new)
     movies_tmdbapi = movies_tmdbapi.append(movies_tmdbapi_theNumbers)
     
@@ -60,7 +66,7 @@ def joinData():
     # =============================================================================
     # #This code needs data pulled from the-numbers.com
     # =============================================================================
-    the_numbers = pd.read_csv(r'c:\users\rebecca\desktop\movies\the numbers\the_numbers.csv', encoding='latin1')
+    the_numbers = pd.read_csv(r'~\projs\Box-Office\data\the_numbers.csv', encoding='latin1')
     print("Done loading The Numbers data")
     
     

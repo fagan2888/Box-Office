@@ -23,6 +23,10 @@ import pandas_datareader as pdr
 import pandas.io.sql as pd_sql
 import sqlite3 as sql
 
+# =============================================================================
+# #File directories will likely need to be updated based on where they are stored on your computer
+# #Also update file directories in "joinDataModule"
+# =============================================================================
 
 # =============================================================================
 # ####Main execution file as of now for cleaning data. SECTION 1.
@@ -66,7 +70,7 @@ movies_full_set = movies_full_set.drop_duplicates(subset=['Movie_Name', 'Movie_D
 movies_full_set = movies_full_set.sort_values(by=['Movie_Date', 'Movie_Name'], ascending=False)
 movies_full_set['Year']=(movies_full_set['Movie_Date']).dt.year
 movies_full_set = movies_full_set.drop_duplicates(subset=['Movie_Name', 'Year'], keep='first')
-
+print("finished removing most duplicates")
 
 # =============================================================================
 # #For our working data set, keep only movies with revenue data
@@ -80,65 +84,65 @@ movies_working_set.reset_index(drop=True, inplace=True)
 #Will think of less-manual way of doing this.
 movies_working_set=movies_working_set.drop(movies_working_set.index[641])
 movies_working_set.reset_index(drop=True, inplace=True)
-
+print("finished reducing dataset based on lack of revenue")
 # =============================================================================
 # #For the purposes of manual entry of missing data, get data ready to split up
 # #among team members.
 # =============================================================================
-#Add a column called 'Delete', where team members will change to '1', if 
-#they deem the movie should be dropped because it's either a duplicate
-#I did not catch, or a movie that was not released in theaters
-movies_working_set['Delete']= 0
+##Add a column called 'Delete', where team members will change to '1', if 
+##they deem the movie should be dropped because it's either a duplicate
+##I did not catch, or a movie that was not released in theaters
+#movies_working_set['Delete']= 0
+#
+#movies_2017 = movies_working_set[(movies_working_set['Movie_Date']>='2017-01-01') & \
+#                             (movies_working_set['Movie_Date']<='2017-12-31')]
+#movies_2018 = movies_working_set[(movies_working_set['Movie_Date']>='2018-01-01')]
+#movies_2016 = movies_working_set[(movies_working_set['Movie_Date']>='2016-01-01') & \
+#                             (movies_working_set['Movie_Date']<='2016-12-31')]
+#movies_2015_2014 = movies_working_set[(movies_working_set['Movie_Date']>='2014-01-01') & \
+#                             (movies_working_set['Movie_Date']<='2015-12-31')]
+#movies_2013_2010 = movies_working_set[(movies_working_set['Movie_Date']>='2010-01-01') & \
+#                             (movies_working_set['Movie_Date']<='2013-12-31')]
+#movies_2009_2008 = movies_working_set[(movies_working_set['Movie_Date']>='2008-01-01') & \
+#                             (movies_working_set['Movie_Date']<='2009-12-31')]
+#movies_2007_1995 = movies_working_set[(movies_working_set['Movie_Date']>='1995-01-01') & \
+#                             (movies_working_set['Movie_Date']<='2007-12-31')]
 
-movies_2017 = movies_working_set[(movies_working_set['Movie_Date']>='2017-01-01') & \
-                             (movies_working_set['Movie_Date']<='2017-12-31')]
-movies_2018 = movies_working_set[(movies_working_set['Movie_Date']>='2018-01-01')]
-movies_2016 = movies_working_set[(movies_working_set['Movie_Date']>='2016-01-01') & \
-                             (movies_working_set['Movie_Date']<='2016-12-31')]
-movies_2015_2014 = movies_working_set[(movies_working_set['Movie_Date']>='2014-01-01') & \
-                             (movies_working_set['Movie_Date']<='2015-12-31')]
-movies_2013_2010 = movies_working_set[(movies_working_set['Movie_Date']>='2010-01-01') & \
-                             (movies_working_set['Movie_Date']<='2013-12-31')]
-movies_2009_2008 = movies_working_set[(movies_working_set['Movie_Date']>='2008-01-01') & \
-                             (movies_working_set['Movie_Date']<='2009-12-31')]
-movies_2007_1995 = movies_working_set[(movies_working_set['Movie_Date']>='1995-01-01') & \
-                             (movies_working_set['Movie_Date']<='2007-12-31')]
+##Send to CSV files for team members:
+#movies_2017.to_csv(r'c:\users\rebecca\desktop\movies_2017.csv')
+#movies_2018.to_csv(r'c:\users\rebecca\desktop\movies_2018.csv')
+#movies_2016.to_csv(r'c:\users\rebecca\desktop\movies_2016.csv')
+#movies_2015_2014.to_csv(r'c:\users\rebecca\desktop\movies_2015_2014.csv')
+#movies_2013_2010.to_csv(r'c:\users\rebecca\desktop\movies_2013_2010.csv')
+#movies_2009_2008.to_csv(r'c:\users\rebecca\desktop\movies_2009_2008.csv')
+#movies_2007_1995.to_csv(r'c:\users\rebecca\desktop\movies_2007_1995.csv')
 
-movies_2017.to_csv(r'c:\users\rebecca\desktop\movies_2017.csv')
-movies_2018.to_csv(r'c:\users\rebecca\desktop\movies_2018.csv')
-movies_2016.to_csv(r'c:\users\rebecca\desktop\movies_2016.csv')
-movies_2015_2014.to_csv(r'c:\users\rebecca\desktop\movies_2015_2014.csv')
-movies_2013_2010.to_csv(r'c:\users\rebecca\desktop\movies_2013_2010.csv')
-movies_2009_2008.to_csv(r'c:\users\rebecca\desktop\movies_2009_2008.csv')
-movies_2007_1995.to_csv(r'c:\users\rebecca\desktop\movies_2007_1995.csv')
-
-movies_working_set_rebuilt.to_csv(r'c:\users\rebecca\desktop\movies_working_set_rebuilt.csv')
 
 # =============================================================================
 # Use if need count of missing values in each important column
 # =============================================================================
-print("Awards", len(movies_working_set)-(movies_working_set['Awards']).count())
-print("Plot", len(movies_working_set)-(movies_working_set['Plot']).count())
-print("Rated", len(movies_working_set)-(movies_working_set['Rated']).count())
-print("imdbVotes", len(movies_working_set)-(movies_working_set['imdbVotes']).count())
-print("RT", len(movies_working_set)-(movies_working_set['Rating_RT']).count())
-print("Name", len(movies_working_set)-(movies_working_set['Movie_Name']).count())
-print("Revenue", len(movies_working_set)-(movies_working_set['Movie_Revenue'] >0).sum())
-print("Date", len(movies_working_set)-(movies_working_set['Movie_Date']).count())
-print("Length", len(movies_working_set)-(movies_working_set['Movie_Length'] >0).sum())
-print("Budget", len(movies_working_set)-(movies_working_set['Movie_Budget'] >0).sum())
-print("Genres", len(movies_working_set)- (movies_working_set.astype(str)['Movie_Genres'] != '[]').sum())
-print("Companies", len(movies_working_set)- (movies_working_set.astype(str)['Movie_Companies'] != '[]').sum())
-print("Actors", len(movies_working_set)- (movies_working_set.astype(str)['Movie_Actors'] != '[]').sum())
-print("keywords", len(movies_working_set)- (movies_working_set.astype(str)['Movie_Keywords'] != '[]').sum())
-print("Coll", len(movies_working_set)- (movies_working_set.astype(str)['Movie_Collection'] != '[]').sum())
-print("Overview", len(movies_working_set)- (movies_working_set['Movie_Overview']).count())
-print("Tagline", len(movies_working_set)- (movies_working_set['Movie_Tagline']).count())
-print("Director", len(movies_working_set)- (movies_working_set.astype(str)['Movie_Director'] != '[]').sum())
-print("Writer", len(movies_working_set)- (movies_working_set.astype(str)['Movie_Writer'] != '[]').sum())
-print("Producer", len(movies_working_set)- (movies_working_set.astype(str)['Movie_Producer'] != '[]').sum())
-print("IMDB", len(movies_working_set)- (movies_working_set['Movie_Rating_IMDB']).count())
-print("Meta", len(movies_working_set)- (movies_working_set['Movie_Rating_Metacritic']).count())
+#print("Awards", len(movies_working_set)-(movies_working_set['Awards']).count())
+#print("Plot", len(movies_working_set)-(movies_working_set['Plot']).count())
+#print("Rated", len(movies_working_set)-(movies_working_set['Rated']).count())
+#print("imdbVotes", len(movies_working_set)-(movies_working_set['imdbVotes']).count())
+#print("RT", len(movies_working_set)-(movies_working_set['Rating_RT']).count())
+#print("Name", len(movies_working_set)-(movies_working_set['Movie_Name']).count())
+#print("Revenue", len(movies_working_set)-(movies_working_set['Movie_Revenue'] >0).sum())
+#print("Date", len(movies_working_set)-(movies_working_set['Movie_Date']).count())
+#print("Length", len(movies_working_set)-(movies_working_set['Movie_Length'] >0).sum())
+#print("Budget", len(movies_working_set)-(movies_working_set['Movie_Budget'] >0).sum())
+#print("Genres", len(movies_working_set)- (movies_working_set.astype(str)['Movie_Genres'] != '[]').sum())
+#print("Companies", len(movies_working_set)- (movies_working_set.astype(str)['Movie_Companies'] != '[]').sum())
+#print("Actors", len(movies_working_set)- (movies_working_set.astype(str)['Movie_Actors'] != '[]').sum())
+#print("keywords", len(movies_working_set)- (movies_working_set.astype(str)['Movie_Keywords'] != '[]').sum())
+#print("Coll", len(movies_working_set)- (movies_working_set.astype(str)['Movie_Collection'] != '[]').sum())
+#print("Overview", len(movies_working_set)- (movies_working_set['Movie_Overview']).count())
+#print("Tagline", len(movies_working_set)- (movies_working_set['Movie_Tagline']).count())
+#print("Director", len(movies_working_set)- (movies_working_set.astype(str)['Movie_Director'] != '[]').sum())
+#print("Writer", len(movies_working_set)- (movies_working_set.astype(str)['Movie_Writer'] != '[]').sum())
+#print("Producer", len(movies_working_set)- (movies_working_set.astype(str)['Movie_Producer'] != '[]').sum())
+#print("IMDB", len(movies_working_set)- (movies_working_set['Movie_Rating_IMDB']).count())
+#print("Meta", len(movies_working_set)- (movies_working_set['Movie_Rating_Metacritic']).count())
 
 
 
@@ -146,19 +150,20 @@ print("Meta", len(movies_working_set)- (movies_working_set['Movie_Rating_Metacri
 # ####SECTION 2
 # ####This second part collects team members efforts to fill in missing data.
 # =============================================================================
-movies_2018 = pd.read_csv(r'c:\users\rebecca\desktop\movies\FilledIn\movies_2018.csv', encoding = 'latin-1')
-movies_2017 = pd.read_csv(r'c:\users\rebecca\desktop\movies\FilledIn\movies_2017.csv', encoding = 'latin-1')
-movies_2016 = pd.read_csv(r'c:\users\rebecca\desktop\movies\FilledIn\movies_2016.csv', encoding = 'latin-1')
-movies_2015_2014 = pd.read_csv(r'c:\users\rebecca\desktop\movies\FilledIn\movies_2015_2014.csv', encoding = 'latin-1')
-movies_2013_2010 = pd.read_csv(r'c:\users\rebecca\desktop\movies\FilledIn\movies_2013_2010.csv', encoding = 'latin-1')
-movies_2009_2008 = pd.read_csv(r'c:\users\rebecca\desktop\movies\FilledIn\movies_2009_2008.csv', encoding = 'latin-1')
-movies_2007_1995 = pd.read_csv(r'c:\users\rebecca\desktop\movies\FilledIn\movies_2007_1995.csv', encoding = 'latin-1')
+movies_2018 = pd.read_csv(r'~\projs\Box-Office\filled_in_data\movies_2018.csv', encoding = 'latin-1')
+movies_2017 = pd.read_csv(r'~\projs\Box-Office\filled_in_data\movies_2017.csv', encoding = 'latin-1')
+movies_2016 = pd.read_csv(r'~\projs\Box-Office\filled_in_data\movies_2016.csv', encoding = 'latin-1')
+movies_2015_2014 = pd.read_csv(r'~\projs\Box-Office\filled_in_data\movies_2015_2014.csv', encoding = 'latin-1')
+movies_2013_2010 = pd.read_csv(r'~\projs\Box-Office\filled_in_data\movies_2013_2010.csv', encoding = 'latin-1')
+movies_2009_2008 = pd.read_csv(r'~\projs\Box-Office\filled_in_data\movies_2009_2008.csv', encoding = 'latin-1')
+movies_2007_1995 = pd.read_csv(r'~\projs\Box-Office\filled_in_data\movies_2007_1995.csv', encoding = 'latin-1')
 
 
 movies_working_set_rebuilt=pd.concat([movies_2018, movies_2017, movies_2016, \
                                       movies_2015_2014, movies_2013_2010, movies_2009_2008, movies_2007_1995])
+print("finished rebuilding dataset based on team member efforts to fill in data")
 # =============================================================================
-# #Fixes human error issues
+# #Fixes human error issues. Mostly stray commas, brackets, semicolons, etc issues.
 # =============================================================================
 movies_working_set_rebuilt=movies_working_set_rebuilt.drop(columns=['Unnamed: 0'])
 movies_working_set_rebuilt.reset_index(drop=True, inplace=True)
@@ -274,8 +279,8 @@ movies_working_set_rebuilt['Movie_Producer'][3274] = "[]"
 
 movies_working_set_rebuilt.reset_index(drop=True, inplace=True)
 
-
-con = sql.connect('movies.db') 
-movies_working_set_rebuilt.to_sql('cleanedMovies_20180803', con)
-con.commit()
-con.close()
+##If you want to save to database, use code below:
+#con = sql.connect('movies.db') 
+#movies_working_set_rebuilt.to_sql('cleanedMovies_20180803', con)
+#con.commit()
+#con.close()
