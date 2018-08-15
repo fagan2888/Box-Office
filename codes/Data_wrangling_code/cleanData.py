@@ -280,7 +280,32 @@ movies_working_set_rebuilt['Movie_Producer'][3274] = "[]"
 movies_working_set_rebuilt.reset_index(drop=True, inplace=True)
 
 ##If you want to save to database, use code below:
-#con = sql.connect('movies.db') 
+#con = sql.connect(r'c:\users\rebecca\projs\Box-Office\movies_dataset\movies.db') 
 #movies_working_set_rebuilt.to_sql('cleanedMovies_20180803', con)
 #con.commit()
 #con.close()
+
+
+# =============================================================================
+# #Discovered issue with 2010 data, uploading missing movies between
+# #Jan - Oct 2010
+# =============================================================================
+
+con = sql.connect(r'c:\users\rebecca\projs\Box-Office\movies_dataset\movies.db') 
+movies_working_set_rebuilt = pd_sql.read_sql('select * from cleanedMovies_20180803', con, index_col='index')
+
+movies_2010 = pd.read_csv(r'~\projs\Box-Office\filled_in_data\movies_2010.csv', encoding = 'latin-1')
+movies_2010=movies_2010.drop(columns=['Unnamed: 0'])
+movies_2010 = movies_2010[1302:1648]
+
+movies_working_set_rebuilt=pd.concat([movies_working_set_rebuilt, movies_2010])
+movies_working_set_rebuilt['Movie_Date']=pd.to_datetime(movies_working_set_rebuilt['Movie_Date'])
+movies_working_set_rebuilt = movies_working_set_rebuilt.sort_values(by=['Movie_Date', 'Movie_Name'], ascending=False)
+movies_working_set_rebuilt.reset_index(drop=True, inplace=True)
+
+##If you want to save to database, use code below:
+#con = sql.connect(r'c:\users\rebecca\projs\Box-Office\movies_dataset\movies.db') 
+#movies_working_set_rebuilt.to_sql('cleanedMovies_20180814', con)
+#con.commit()
+#con.close()
+

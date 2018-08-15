@@ -18,7 +18,7 @@ import pandas.io.sql as pd_sql
 import sqlite3 as sql
 #My own module:
 import movieFunctions as mf
-
+from movieFunctions import imputeRatings
 
 # =============================================================================
 # #File directories will likely need to be updated based on where they are stored on your computer
@@ -36,7 +36,7 @@ companies = pd.read_csv(r'~\projs\Box-Office\data\production_companies.csv', enc
 # =============================================================================
 
 con = sql.connect(r'c:\users\rebecca\projs\Box-Office\movies_dataset\movies.db') 
-movies_working_set_rebuilt = pd_sql.read_sql('select * from cleanedMovies_20180803', con, index_col='index')
+movies_working_set_rebuilt = pd_sql.read_sql('select * from cleanedMovies_20180814', con, index_col='index')
 
 test = movies_working_set_rebuilt.copy(deep=True)
 test = test[test['Delete']!=1]
@@ -227,6 +227,18 @@ test['Rating_RT']=test['Rating_RT'].apply(lambda x: float(x) if (type(x)==str) e
 print("Finished converting to float")
 
 # =============================================================================
+# Impute missing ratings data
+# =============================================================================
+# Use Rotten Tomatoes, then Metacritic, then IMDB in order of best sub.
+# Otherwise use median.  More explanation in MovieFunctions code.     
+        
+test['Rating_RT']= test.apply(imputeRatings, args=(test, 'Rotten Tomatoes',), axis=1)
+test['Movie_Rating_IMDB']= test.apply(imputeRatings, args=(test, 'Internet Movie Database',), axis=1)
+test['Movie_Rating_Metacritic']= test.apply(imputeRatings, args=(test, 'Metacritic',), axis=1)
+
+print("Finished imputing movie ratings")
+
+# =============================================================================
 # Sum revenue of movies the listed actors generated in previous movies
 # =============================================================================
 test['Movie_Director'] = test['Movie_Director'].apply(ast.literal_eval)
@@ -255,7 +267,7 @@ mf.sumRevenue(test, 'Movie_Producer', 'Revenue_Producer', 'Revenue_Producer_Real
 print("Finished summing up producer revenues")
 
 ##Add to database
-#con = sql.connect('movies.db') 
+#con = sql.connect(r'c:\users\rebecca\projs\Box-Office\movies_dataset\movies.db') 
 #test.to_sql('preProcessMovies_20180803', con)
 #con.commit()
 #con.close()
@@ -263,7 +275,7 @@ print("Finished summing up producer revenues")
 # =============================================================================
 # Save working dataset into SQLite database to start modeling.
 # =============================================================================
-#Convert all columns of lists into strings of lists and rename to easier names
+#Convert all columns of lists into strings of lists to store in database, and rename to easier names
 
 test[['Movie_Genres', 'Movie_Companies', 'Movie_Actors', 'Movie_Keywords', 'Movie_Collection', \
        'Movie_Director', 'Movie_Writer', 'Movie_Producer','Actors']] = \
@@ -272,7 +284,7 @@ test[['Movie_Genres', 'Movie_Companies', 'Movie_Actors', 'Movie_Keywords', 'Movi
        
 ###Add to database       
 #con = sql.connect(r'c:\users\rebecca\projs\Box-Office\movies_dataset\movies.db') 
-#test.to_sql('preProcessMovies_20180804', con)
+#test.to_sql('preProcessMovies_20180814', con)
 #con.commit()
 #con.close()
 
@@ -290,8 +302,8 @@ test.rename(columns={'rating': 'Rating_MovieLens', 'Movie_Name': 'Name', \
 test=test.drop(columns=['Delete'])
 
 ###Add to database 
-#con = sql.connect('movies.db') 
-#test.to_sql('finalMovies_20180804', con)
+#con = sql.connect(r'c:\users\rebecca\projs\Box-Office\movies_dataset\movies.db') 
+#test.to_sql('finalMovies_20180814', con)
 #con.commit()
 #con.close()
 

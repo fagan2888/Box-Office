@@ -623,4 +623,51 @@ def sumRevenue(data, column, sumColumn, sumColumn_real):
             data[sumColumn][index]= revenue
             data[sumColumn_real][index]= revenue_real
                 
-            
+
+def imputeRatings(x, data, source):
+    #Impute by first seeing if other ratings columns are filled in.
+    #Priority order is Rotten Tomatoes -> Metacritic -> IMDB.
+    #Remember Rotten and Metacritic on scale of 0-100; IMDB 0-10.
+    
+    #Ignore if column "length" is missing.  This is because
+    #the vast majority of the remaining duplicated movies are missing
+    #everything except rev/budget/date. So filtering on a column like
+    #'length' is a way to ignore potential duplicate movies and not waste
+    #time imputing their missing cells.
+   
+    if source =='Internet Movie Database':    
+        if (pd.isnull(x['Movie_Rating_IMDB'])) & (x['Movie_Length']>0):
+            if x['Rating_RT']>=0:
+                return x['Rating_RT']/10
+            elif x['Movie_Rating_Metacritic']>=0:
+                return x['Movie_Rating_Metacritic']/10
+            else: ####Return column mean
+                return data['Movie_Rating_IMDB'].median()
+        elif x['Movie_Rating_IMDB']>=0:
+            return x['Movie_Rating_IMDB']
+ 
+    elif source =='Rotten Tomatoes':    
+        if (pd.isnull(x['Rating_RT'])) & (x['Movie_Length']>0):
+            if x['Movie_Rating_Metacritic']>=0:
+                return x['Movie_Rating_Metacritic']
+            elif x['Movie_Rating_IMDB']>=0:
+                return x['Movie_Rating_IMDB']*10
+            else: ####Return column mean
+                return data['Rating_RT'].median()
+        elif x['Rating_RT']>=0:
+            return x['Rating_RT']
+         
+    elif source =='Metacritic':    
+        if (pd.isnull(x['Movie_Rating_Metacritic'])) & (x['Movie_Length']>0):
+            if x['Rating_RT']>=0:
+                return x['Rating_RT']
+            elif x['Movie_Rating_IMDB']>=0:
+                return x['Movie_Rating_IMDB']*10
+            else: ####Return column mean
+                return data['Movie_Rating_Metacritic'].median()
+        elif x['Movie_Rating_Metacritic']>=0:
+            return x['Movie_Rating_Metacritic']            
+        
+        
+        
+        
