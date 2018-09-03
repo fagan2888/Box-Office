@@ -26,8 +26,8 @@ bokeh=0.12.13=py36h047fa9f_0
 boto=2.48.0=py36h1a776d2_1
 bottleneck=1.2.1=py36hd119dfa_0
 bzip2=1.0.6=hfa6e2cd_2
-ca-certificates=2018.8.13=ha4d7672_0
-certifi=2018.8.13=py36_0
+ca-certificates=2018.03.07=0
+certifi=2018.8.24=py36_1
 cffi=1.11.4=py36hfa6e2cd_0
 chardet=3.0.4=py36h420ce6e_1
 click=6.7=py36hec8c647_0
@@ -35,7 +35,7 @@ cloudpickle=0.5.2=py36_1
 clyent=1.2.2=py36hb10d595_1
 colorama=0.3.9=py36h029ae33_0
 comtypes=1.1.4=py36_0
-conda=4.5.10=py36_0
+conda=4.5.11=py36_0
 conda-build=3.4.1=py36_0
 conda-env=2.6.0=h36134e3_1
 conda-verify=2.0.0=py36h065de53_0
@@ -43,7 +43,7 @@ console_shortcut=0.1.1=h6bb2dd7_3
 constantly=15.1.0=py_0
 contextlib2=0.5.5=py36he5d52c0_0
 coverage=4.5.1=py36hfa6e2cd_0
-cryptography=2.1.4=py36he1d7878_0
+cryptography=2.3.1=py36h74b6da3_0
 cssselect=1.0.3=py_0
 curl=7.58.0=h7602738_0
 cycler=0.10.0=py36h009560c_0
@@ -60,7 +60,7 @@ et_xmlfile=1.0.1=py36h3d2d736_0
 fastcache=1.0.2=py36hfa6e2cd_2
 feedparser=5.2.1=py36_0
 filelock=2.0.13=py36h20000bf_0
-flask=0.12.2=py36h98b5e8f_0
+flask=1.0.2=py36_1
 flask-cors=3.0.3=py36h8a3855d_0
 freetype=2.8.1=ha63716d_1
 get_terminal_size=1.0.0=h38e98db_0
@@ -143,7 +143,7 @@ numpydoc=0.7.0=py36ha25429e_0
 odo=0.5.1=py36h7560279_0
 olefile=0.45.1=py36_0
 openpyxl=2.4.10=py36_0
-openssl=1.0.2o=hfa6e2cd_1
+openssl=1.0.2p=hfa6e2cd_0
 packaging=16.8=py36ha0986f6_1
 pandas=0.22.0=py36h6538335_0
 pandas-datareader=0.6.0=py36_0
@@ -203,7 +203,7 @@ queuelib=1.5.0=py36_0
 requests=2.18.4=py36h4371aae_1
 requests-file=1.4.3=py36_0
 requests-ftp=0.3.1=py36_0
-rope=0.10.7=py36had63a69_0
+rope=0.11.0=py36_0
 ruamel_yaml=0.15.35=py36hfa6e2cd_1
 scikit-image=0.13.1=py36hfa6e2cd_1
 scikit-learn=0.19.1=py36h53aea1b_0
