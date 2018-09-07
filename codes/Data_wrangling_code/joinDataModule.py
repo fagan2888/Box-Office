@@ -13,50 +13,62 @@ import datetime
 from datetime import datetime
 import zipfile
 
-
+import os
 import time
 import sqlite3
 import matplotlib.pyplot as plt
 from pandas.io.json import json_normalize
 
 # =============================================================================
-# #File directories will likely need to be updated based on where files are stored on your computer
-# 
+# #File directories may need to be updated based on where files are stored on your computer
+# #However, these paths may work without needing to be updated.
 # =============================================================================
-
+two_up = os.path.abspath(os.path.join(os.getcwd(),"../.."))
+movies_path = two_up + '\data\movies_metadata.csv'
+ratings_path = two_up + '\data\\ratings.zip'
+credits_path = two_up + '\data\credits.zip'
+keywords_path = two_up + '\data\keywords.csv'
+links_path = two_up + '\data\links.csv'
+tmovies_path = two_up + '\data\\tmdb_5000_movies.csv'
+tcredits_path = two_up + '\data\\tmdb_5000_credits.csv'
+omdb_path = two_up + '\data\omdb_pull.csv'
+tmdb_path = two_up + '\data\movies_tmdbapi_full.csv'
+tpickle_path = two_up + '\data\movies_tmdbapi_full_new'
+tpicklenew_path = two_up + '\data\movies_tmdbapi_full_theNumbers'
+thenum_path = two_up + '\data\\the_numbers.csv'
 
 def joinData():
     
     # =============================================================================
     # #This code needs information from Kaggle dataset here: https://www.kaggle.com/rounakbanik/the-movies-dataset/data,
     # =============================================================================
-    movies = pd.read_csv(r"~\projs\Box-Office\data\movies_metadata.csv")
-    zf = zipfile.ZipFile(r"c:\users\rebecca\projs\Box-Office\data\ratings.zip")
+    movies = pd.read_csv(movies_path)
+    zf = zipfile.ZipFile(ratings_path)
     ratings = pd.read_csv(zf.open('ratings.csv'))
-    zf = zipfile.ZipFile(r"c:\users\rebecca\projs\Box-Office\data\credits.zip")
+    zf = zipfile.ZipFile(credits_path)
     movie_credits = pd.read_csv(zf.open('credits.csv'))
-    keywords = pd.read_csv(r'~\projs\Box-Office\data\keywords.csv')
-    id_lookup= pd.read_csv(r'~\projs\Box-Office\data\links.csv')
+    keywords = pd.read_csv(keywords_path)
+    id_lookup= pd.read_csv(links_path)
     print("Done loading Kaggle data part 1")
     
     
     # =============================================================================
     # #This code needs information from Kaggle dataset here: https://www.kaggle.com/tmdb/tmdb-movie-metadata/data,
     # =============================================================================
-    movies_tmdb = pd.read_csv(r'~\projs\Box-Office\data\tmdb_5000_movies.csv')
-    credits_tmdb = pd.read_csv(r'~\projs\Box-Office\data\tmdb_5000_credits.csv')
+    movies_tmdb = pd.read_csv(tmovies_path)
+    credits_tmdb = pd.read_csv(tcredits_path)
     print("Done loading Kaggle data part 2")
     
     
     # =============================================================================
     # #This code needs data pulled from OMDB API and TMDB API
     # =============================================================================
-    movies_omdbapi = pd.read_csv(r'~\projs\Box-Office\data\omdb_pull.csv')
-    movies_tmdbapi = pd.read_csv(r'~\projs\Box-Office\data\movies_tmdbapi_full.csv')
+    movies_omdbapi = pd.read_csv(omdb_path)
+    movies_tmdbapi = pd.read_csv(tmdb_path)
     movies_tmdbapi=movies_tmdbapi.drop(columns=['Unnamed: 0'])
     #genre_tmdbapi = pd.read_csv(r'c:\users\rebecca\desktop\movies\API\genre_ids.csv')
-    movies_tmdbapi_new =pd.DataFrame(pd.read_pickle(r'c:\users\rebecca\projs\Box-Office\data\movies_tmdbapi_full_new'))
-    movies_tmdbapi_theNumbers =pd.DataFrame(pd.read_pickle(r'c:\users\rebecca\projs\Box-Office\data\movies_tmdbapi_full_theNumbers'))    
+    movies_tmdbapi_new =pd.DataFrame(pd.read_pickle(tpickle_path))
+    movies_tmdbapi_theNumbers =pd.DataFrame(pd.read_pickle(tpicklenew_path))    
     movies_tmdbapi = movies_tmdbapi.append(movies_tmdbapi_new)
     movies_tmdbapi = movies_tmdbapi.append(movies_tmdbapi_theNumbers)
     
@@ -66,7 +78,7 @@ def joinData():
     # =============================================================================
     # #This code needs data pulled from the-numbers.com
     # =============================================================================
-    the_numbers = pd.read_csv(r'~\projs\Box-Office\data\the_numbers.csv', encoding='latin1')
+    the_numbers = pd.read_csv(thenum_path, encoding='latin1')
     print("Done loading The Numbers data")
     
     
@@ -115,10 +127,10 @@ def joinData():
     kaggle_plus_api = pd.merge(kaggle_full, movies_omdbapi, how="outer", left_on='imdb_id', right_on = 'imdbID')
     kaggle_apis = pd.merge(kaggle_plus_api, movies_tmdbapi, how="outer", left_on='tmdbId', right_on='id')
     
-    kaggle_apis=kaggle_apis.drop(columns=['homepage','id_x', 'movie_id', 'Unnamed: 0_x','DVD','Poster', 'Response', \
-                                   'Season','type','website', 'imdbID', 'seriesID','totalSeasons','Unnamed: 0_y', \
-                                   'adult','backdrop_path','id_y', 'poster_path', 'video'])
-    kaggle_apis = kaggle_apis.drop(columns = ['id_y', 'backdrop_path', 'Website', 'Error', 'Episode', 'Type', 'status', 'imdb_id'])
+    #kaggle_apis=kaggle_apis.drop(columns=['homepage','id_x', 'movie_id', 'Unnamed: 0','DVD','Poster', 'Response', \
+    #                               'Season','Type','Website', 'imdbID', 'seriesID','totalSeasons', \
+    #                               'id_y'])
+    #kaggle_apis = kaggle_apis.drop(columns = ['Error', 'Episode',  'status'])
     
     kaggle_apis = kaggle_apis.iloc[kaggle_apis.astype(str).drop_duplicates(keep='first').index]
     kaggle_apis.reset_index(drop=True, inplace=True)
@@ -139,11 +151,15 @@ def joinData():
     kaggle_apis['original_title'] = kaggle_apis['original_title'].str.lower()
     the_numbers['Movie'] = the_numbers['Movie'].str.lower()
     
+    kaggle_apis['release_date_year'] = pd.to_datetime(kaggle_apis['release_date']).dt.year
+    the_numbers['Release Date year'] = the_numbers['Release Date'].dt.year
+    
     #Joining using movie name and year of release
     movies_full=pd.merge(kaggle_apis,the_numbers, how="outer", \
-                  left_on=['original_title',pd.to_datetime(kaggle_apis['release_date']).dt.year], \
-                  right_on=['Movie', the_numbers['Release Date'].dt.year])
-    movies_full = movies_full.drop(columns = ['Unnamed: 0'])
+                  left_on=['original_title','release_date_year'], \
+                  right_on=['Movie', 'Release Date year'])
+    
+    movies_full = movies_full.drop(columns = ['Unnamed: 0', 'release_date_year', 'Release Date year'])
     
     movies_full = movies_full.iloc[movies_full.astype(str).drop_duplicates(keep='first').index]
     
@@ -151,6 +167,5 @@ def joinData():
     
     print("Done joining The Numbers data")
     
-    ##########Might need to run The Numbers data through APIs!!!!!!!!!!!!
     return movies_full
     

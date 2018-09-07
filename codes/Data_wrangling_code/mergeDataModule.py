@@ -27,8 +27,8 @@ def mergeData(x):
     # NOT EFFICIENT, BECAUSE NEED TO UPDATE HARDCODED INDEXES WHERE DUPLICATE COLUMNS NAME IS 
     # =============================================================================
     column_names = x.columns.values
-    column_names[29] = 'title_1'
-    column_names[57] = 'title_2'
+    column_names[10] = 'title_1'
+    column_names[29] = 'title_2'
     x.columns = column_names
 
     # =============================================================================
@@ -320,16 +320,21 @@ def mergeData(x):
     
     movie_pop_list_columns = ['popularity', 'popularity_x', 'popularity_y']
     
-    x['popularity'] = x['popularity'].apply(lambda y: \
-                                     float(y)  if type(y)==str else y) 
-    x['popularity_x'] = x['popularity_x'].apply(lambda y: \
-                                     float(y) if type(y)==str else y) 
-    x['popularity_y'] = x['popularity_y'].apply(lambda y: \
-                                     float(y) if type(y)==str else y) 
+#    x['popularity'] = x['popularity'].apply(lambda y: \
+#                                     float(y)  if type(y)==str else y) 
+#    x['popularity_x'] = x['popularity_x'].apply(lambda y: \
+#                                     float(y) if type(y)==str else y) 
+#    x['popularity_y'] = x['popularity_y'].apply(lambda y: \
+#                                     float(y) if type(y)==str else y) 
     
     
-    x['TMDB_popularity'] = x.apply(mf.getMoviePop,args=(movie_pop_list_columns,), axis=1)
+#    x['TMDB_popularity'] = x.apply(mf.getMoviePop,args=(movie_pop_list_columns,), axis=1)
+    x['TMDB_popularity'] = x['popularity']
     x=x.drop(columns=movie_pop_list_columns)
+
+    x=x.drop(columns=['homepage', 'id_x', 'status', 'DVD', 'Episode', 'Error', 'Poster', 'Response', 'Season', \
+                      'Type', 'Website', 'seriesID', 'totalSeasons', 'id_y'])
+
     print("Done merging Movie Popularity")
     
     return x

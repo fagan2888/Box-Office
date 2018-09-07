@@ -13,6 +13,9 @@ import json
 import ast
 import re
 import math
+import os
+pd.core.common.is_list_like = pd.api.types.is_list_like
+
 import pandas_datareader as pdr
 import pandas.io.sql as pd_sql
 import sqlite3 as sql
@@ -20,13 +23,13 @@ import sqlite3 as sql
 import movieFunctions as mf
 from movieFunctions import imputeRatings
 
-# =============================================================================
-# #File directories will likely need to be updated based on where they are stored on your computer
-# 
-# =============================================================================
+two_up = os.path.abspath(os.path.join(os.getcwd(),"../.."))
+db_path = two_up + '\database\movies.db'
+comp_path = two_up + '\data\production_companies.csv'
+
 
 #Import production commpany lookup table for later use
-companies = pd.read_csv(r'~\projs\Box-Office\data\production_companies.csv', encoding = 'latin-1')
+companies = pd.read_csv(comp_path, encoding = 'latin-1')
 
 # =============================================================================
 # This code takes our dataset and modifies some of the text and/or categorical
@@ -35,7 +38,7 @@ companies = pd.read_csv(r'~\projs\Box-Office\data\production_companies.csv', enc
 
 # =============================================================================
 
-con = sql.connect(r'c:\users\rebecca\projs\Box-Office\movies_dataset\movies.db') 
+con = sql.connect(db_path) 
 movies_working_set_rebuilt = pd_sql.read_sql('select * from cleanedMovies_20180814', con, index_col='index')
 
 test = movies_working_set_rebuilt.copy(deep=True)
@@ -267,7 +270,7 @@ mf.sumRevenue(test, 'Movie_Producer', 'Revenue_Producer', 'Revenue_Producer_Real
 print("Finished summing up producer revenues")
 
 ##Add to database
-#con = sql.connect(r'c:\users\rebecca\projs\Box-Office\movies_dataset\movies.db') 
+#con = sql.connect(r'c:\users\rebecca\projs\Box-Office\database\movies.db') 
 #test.to_sql('preProcessMovies_20180803', con)
 #con.commit()
 #con.close()
@@ -283,7 +286,7 @@ test[['Movie_Genres', 'Movie_Companies', 'Movie_Actors', 'Movie_Keywords', 'Movi
        'Movie_Director', 'Movie_Writer', 'Movie_Producer','Actors']].astype(str)
        
 ###Add to database       
-#con = sql.connect(r'c:\users\rebecca\projs\Box-Office\movies_dataset\movies.db') 
+#con = sql.connect(r'c:\users\rebecca\projs\Box-Office\database\movies.db') 
 #test.to_sql('preProcessMovies_20180814', con)
 #con.commit()
 #con.close()
@@ -302,7 +305,7 @@ test.rename(columns={'rating': 'Rating_MovieLens', 'Movie_Name': 'Name', \
 test=test.drop(columns=['Delete'])
 
 ###Add to database 
-#con = sql.connect(r'c:\users\rebecca\projs\Box-Office\movies_dataset\movies.db') 
+#con = sql.connect(r'c:\users\rebecca\projs\Box-Office\database\movies.db') 
 #test.to_sql('finalMovies_20180814', con)
 #con.commit()
 #con.close()

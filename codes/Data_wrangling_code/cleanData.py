@@ -13,20 +13,14 @@ import json
 import ast
 import re
 import math
-import pandas_datareader as pdr
+import os
 #My own modules:
 import movieFunctions as mf
 import joinDataModule as jd
 import parseColumnsModule as pc
 import mergeDataModule as md
-import pandas_datareader as pdr
 import pandas.io.sql as pd_sql
 import sqlite3 as sql
-
-# =============================================================================
-# #File directories will likely need to be updated based on where they are stored on your computer
-# #Also update file directories in "joinDataModule"
-# =============================================================================
 
 # =============================================================================
 # ####Main execution file as of now for cleaning data. SECTION 1.
@@ -150,13 +144,23 @@ print("finished reducing dataset based on lack of revenue")
 # ####SECTION 2
 # ####This second part collects team members efforts to fill in missing data.
 # =============================================================================
-movies_2018 = pd.read_csv(r'~\projs\Box-Office\filled_in_data\movies_2018.csv', encoding = 'latin-1')
-movies_2017 = pd.read_csv(r'~\projs\Box-Office\filled_in_data\movies_2017.csv', encoding = 'latin-1')
-movies_2016 = pd.read_csv(r'~\projs\Box-Office\filled_in_data\movies_2016.csv', encoding = 'latin-1')
-movies_2015_2014 = pd.read_csv(r'~\projs\Box-Office\filled_in_data\movies_2015_2014.csv', encoding = 'latin-1')
-movies_2013_2010 = pd.read_csv(r'~\projs\Box-Office\filled_in_data\movies_2013_2010.csv', encoding = 'latin-1')
-movies_2009_2008 = pd.read_csv(r'~\projs\Box-Office\filled_in_data\movies_2009_2008.csv', encoding = 'latin-1')
-movies_2007_1995 = pd.read_csv(r'~\projs\Box-Office\filled_in_data\movies_2007_1995.csv', encoding = 'latin-1')
+two_up = os.path.abspath(os.path.join(os.getcwd(),"../.."))
+movies2018_path = two_up + r'\filled_in_data\movies_2018.csv'
+movies2017_path = two_up + r'\filled_in_data\movies_2017.csv'
+movies2016_path = two_up + r'\filled_in_data\movies_2016.csv'
+movies201514_path = two_up + r'\filled_in_data\movies_2015_2014.csv'
+movies201310_path = two_up + r'\filled_in_data\movies_2013_2010.csv'
+movies200908_path = two_up + r'\filled_in_data\movies_2009_2008.csv'
+movies200795_path = two_up + r'\filled_in_data\movies_2007_1995.csv'
+
+
+movies_2018 = pd.read_csv(movies2018_path, encoding = 'latin-1')
+movies_2017 = pd.read_csv(movies2017_path, encoding = 'latin-1')
+movies_2016 = pd.read_csv(movies2016_path, encoding = 'latin-1')
+movies_2015_2014 = pd.read_csv(movies201514_path, encoding = 'latin-1')
+movies_2013_2010 = pd.read_csv(movies201310_path, encoding = 'latin-1')
+movies_2009_2008 = pd.read_csv(movies200908_path, encoding = 'latin-1')
+movies_2007_1995 = pd.read_csv(movies200795_path, encoding = 'latin-1')
 
 
 movies_working_set_rebuilt=pd.concat([movies_2018, movies_2017, movies_2016, \
@@ -280,7 +284,7 @@ movies_working_set_rebuilt['Movie_Producer'][3274] = "[]"
 movies_working_set_rebuilt.reset_index(drop=True, inplace=True)
 
 ##If you want to save to database, use code below:
-#con = sql.connect(r'c:\users\rebecca\projs\Box-Office\movies_dataset\movies.db') 
+#con = sql.connect(r'c:\users\rebecca\projs\Box-Office\database\movies.db') 
 #movies_working_set_rebuilt.to_sql('cleanedMovies_20180803', con)
 #con.commit()
 #con.close()
@@ -290,11 +294,14 @@ movies_working_set_rebuilt.reset_index(drop=True, inplace=True)
 # #Discovered issue with 2010 data, uploading missing movies between
 # #Jan - Oct 2010
 # =============================================================================
+two_up = os.path.abspath(os.path.join(os.getcwd(),"../.."))
+db_path = two_up + '\database\movies.db'
+movies2010_path = two_up + r'\filled_in_data\movies_2010.csv'
 
-con = sql.connect(r'c:\users\rebecca\projs\Box-Office\movies_dataset\movies.db') 
+con = sql.connect(db_path) 
 movies_working_set_rebuilt = pd_sql.read_sql('select * from cleanedMovies_20180803', con, index_col='index')
 
-movies_2010 = pd.read_csv(r'~\projs\Box-Office\filled_in_data\movies_2010.csv', encoding = 'latin-1')
+movies_2010 = pd.read_csv(movies2010_path, encoding = 'latin-1')
 movies_2010=movies_2010.drop(columns=['Unnamed: 0'])
 movies_2010 = movies_2010[1302:1648]
 
@@ -304,7 +311,7 @@ movies_working_set_rebuilt = movies_working_set_rebuilt.sort_values(by=['Movie_D
 movies_working_set_rebuilt.reset_index(drop=True, inplace=True)
 
 ##If you want to save to database, use code below:
-#con = sql.connect(r'c:\users\rebecca\projs\Box-Office\movies_dataset\movies.db') 
+#con = sql.connect(r'c:\users\rebecca\projs\Box-Office\database\movies.db') 
 #movies_working_set_rebuilt.to_sql('cleanedMovies_20180814', con)
 #con.commit()
 #con.close()
