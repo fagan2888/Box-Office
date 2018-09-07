@@ -9,13 +9,16 @@ import pandas as pd
 import json
 import requests
 import time
+import os
 
 #This code will use names/years of movies in 2017-mid 2018
-#to pull from the themovies db API. If you want to run this code,
-#save the CSV file with movies information somewhere on your computer.
+#to pull from the themovies db API. 
 
-#Replace this directory with the location where you saved the CSV file.
-movies = pd.read_csv(r'c:\users\rebecca\desktop\movies\2018 Movies\2017_movies_omdb.csv', encoding='latin1')
+#Change last line in file to where you want the output file to be saved.
+
+two_up = os.path.abspath(os.path.join(os.getcwd(),"../.."))
+path = two_up + '\data\\2017_movies_omdb.csv'
+movies = pd.read_csv(path, encoding='latin1')
 
 #Building our API URL. 
 #Get your own API Key from the OMDB API website

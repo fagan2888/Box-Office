@@ -10,6 +10,7 @@ import json
 import requests
 import time
 from pandas.io.json import json_normalize
+import os
 
 #This code will use names/years of movies in The Numbers website
 #to do a first run pull from the The Movies DB API (TMDB). 
@@ -17,10 +18,11 @@ from pandas.io.json import json_normalize
 #So, I will do a second run pull using the id that I receive from
 #first round pull.
 
-#If you want to run this code,
-#save the CSV file with movies name and release data info somewhere on your computer.
-#Replace this directory with the location where you saved the CSV file.
-movies = pd.read_csv(r'c:\users\rebecca\desktop\movies\The Numbers\the_numbers.csv', encoding='latin1')
+#Change last line in file to where you want the output file to be saved.
+
+two_up = os.path.abspath(os.path.join(os.getcwd(),"../.."))
+path = two_up + '\data\\the_numbers.csv'
+movies = pd.read_csv(path, encoding='latin1')
 
 #Building our API URL. 
 #Get your own API Key from the The Movies Database API website

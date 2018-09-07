@@ -9,14 +9,17 @@ import pandas as pd
 import json
 import requests
 import time
+import os
 
 #This code needs the "imdb_ids" of the movies listed in
 #the Kaggle dataset here: https://www.kaggle.com/rounakbanik/the-movies-dataset/data,
-#in "movies_metadata.csv". If you want to run this code,
-#download that CSV and save it somewhere on your computer.
+#in "movies_metadata.csv". 
 
-#Replace this directory with the location where you saved the CSV file.
-movies = pd.read_csv(r'c:\users\rebecca\desktop\movies\TheMovies\movies_metadata.csv')
+#Change last line in file to where you want the output file to be saved.
+
+two_up = os.path.abspath(os.path.join(os.getcwd(),"../.."))
+path = two_up + '\data\movies_metadata.csv'
+movies = pd.read_csv(path)
 #Only keep movies that are post 1995
 movies_new = movies[movies['release_date']>='1995-01-01']
 
