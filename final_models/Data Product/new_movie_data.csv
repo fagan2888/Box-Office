@@ -1,0 +1,6 @@
+﻿Budget_Real,Holiday,Summer,Spring,Fall,Winter,Rating_RT,Rating_IMDB,Rating_Metacritic,isCollection,Length,Genre_Drama,Genre_Comedy,Genre_Action_Adventure,Genre_Thriller _Horror,Genre_Romance,Genre_Crime_Mystery,Genre_Animation,Genre_Scifi,Genre_Documentary,Genre_Other,Rated_G_PG,Rated_PG-13,Rated_R,Rated_Other,Comp_Disney,Comp_DreamWorks,Comp_Fox,Comp_Lionsgate,Comp_MGM,Comp_MiraMax,Comp_Paramount,Comp_Sony,Comp_Universal,Comp_WarnerBros,Comp_Other,Revenue_Actor_Real,Revenue_Director_Real,Revenue_Writer_Real
+30000000,0,1,0,0,0,0.93,7.7,74,0,120,0,1,0,0,1,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,1,1,2.71E+07,9.87E+08,8.76E+06
+40000000,0,1,0,0,0,0.22,5.2,22,0,91,0,1,1,0,0,1,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,1,4.37E+04,4.54E+05,4.25E+04
+178000000,0,1,0,0,0,0.97,8.2,86,1,147,0,0,1,1,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,1,0,0,0,1,5.20E+07,6.87E+09,7.12E+07
+75000000,0,1,0,0,0,0.71,7.8,59,1,104,1,1,1,0,0,0,1,0,0,1,1,0,0,0,1,0,0,0,0,0,0,0,0,0,1,1.44E+05,7.27E+08,3.40E+07
+15000000,0,1,0,0,0,0.81,7.9,83,0,134,1,1,0,0,0,1,0,0,0,1,0,0,1,0,0,0,0,0,1,0,0,0,0,0,1,6.12E+05,8.13E+07,5.14E+05
