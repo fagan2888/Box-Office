@@ -20,6 +20,7 @@ backports.shutil_get_terminal_size=1.0.0=py36h79ab834_2
 beautifulsoup4=4.6.0=py36hd4cc5e8_1
 bitarray=0.8.1=py36hfa6e2cd_1
 bkcharts=0.2=py36h7e685f7_0
+blas=1.0=mkl
 blaze=0.11.3=py36h8a29ca5_0
 bleach=2.1.2=py36_0
 bokeh=0.12.13=py36h047fa9f_0
@@ -124,6 +125,8 @@ menuinst=1.4.11=py36hfa6e2cd_0
 mistune=0.8.3=py36_0
 mkl=2018.0.2=1
 mkl-service=1.1.2=py36h57e144c_4
+mkl_fft=1.0.1=py36h452e1ab_0
+mkl_random=1.0.1=py36h9258bd6_0
 more-itertools=4.2.0=py36_0
 mpmath=1.0.0=py36hacc8adf_2
 msgpack-python=0.5.1=py36he980bc4_0
@@ -138,14 +141,15 @@ nose=1.3.7=py36h1c3779e_2
 notebook=5.4.1=py36_0
 numba=0.36.2=np114py36h12cb543_0
 numexpr=2.6.4=py36h30784b8_0
-numpy=1.14.0=py36h4a99626_1
+numpy=1.14.3=py36h9fa60d3_1
+numpy-base=1.14.3=py36h555522e_1
 numpydoc=0.7.0=py36ha25429e_0
 odo=0.5.1=py36h7560279_0
 olefile=0.45.1=py36_0
 openpyxl=2.4.10=py36_0
 openssl=1.0.2p=hfa6e2cd_0
 packaging=16.8=py36ha0986f6_1
-pandas=0.22.0=py36h6538335_0
+pandas=0.23.4=py36h830ac7b_0
 pandas-datareader=0.6.0=py36_0
 pandoc=1.19.2.1=hb2460c7_1
 pandocfilters=1.4.2=py36h3ef6317_1
@@ -179,7 +183,7 @@ pyflakes=1.6.0=py36h0b975d6_0
 pygments=2.2.0=py36hb010967_0
 pylint=1.8.2=py36_0
 pyodbc=4.0.22=py36h6538335_0
-pyopenssl=17.5.0=py36h5b7d817_0
+pyopenssl=18.0.0=py36_0
 pyparsing=2.2.0=py36h785a196_1
 pyqt=5.6.0=py36hb5ed885_5
 pysocks=1.6.7=py36h698d350_1
